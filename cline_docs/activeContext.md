@@ -1,65 +1,194 @@
-# Contexto Ativo - Cuattro
+# Contexto Ativo
 
-## Status Atual
-- Desenvolvimento inicial do frontend
-- Configuração de autenticação Auth0
-- Implementação do sistema de carrinho
-- Desenvolvimento da API backend
+## 🔄 Estado Global
 
-## Trabalho em Andamento
-1. Correção de bugs de autenticação
-   - Estado inválido no login Auth0
-   - Avisos do React Router
-   - Validação de formulários
+### AppState
+```typescript
+interface AppState {
+  user: User | null;
+  cart: Carrinho | null;
+  items: Item[];
+  loading: boolean;
+  error: string | null;
+}
+```
 
-2. Melhorias de UX/UI
-   - Navbar responsiva
-   - Feedback visual de ações
-   - Loading states
+### AppAction
+```typescript
+type AppAction =
+  | { type: 'SET_USER'; payload: User | null }
+  | { type: 'SET_CART'; payload: Carrinho | null }
+  | { type: 'SET_ITEMS'; payload: Item[] }
+  | { type: 'ADD_TO_CART'; payload: ItemCarrinho }
+  | { type: 'REMOVE_FROM_CART'; payload: number }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null };
+```
 
-3. Integração Backend
-   - Endpoints de itens
-   - Sistema de pedidos
-   - Upload de imagens
+## 🎯 Hooks Personalizados
 
-## Próximos Passos
-1. Sistema de Pedidos
-   - Implementar fluxo completo
-   - Adicionar notificações
-   - Integrar pagamentos
+### useAppContext
+```typescript
+const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext deve ser usado dentro de um AppProvider');
+  }
+  return context;
+};
+```
 
-2. Área Administrativa
-   - Dashboard com métricas
-   - Gestão de usuários
-   - Relatórios
+### useCart
+```typescript
+const useCart = () => {
+  const { state, dispatch } = useAppContext();
+  
+  const addToCart = async (itemId: number, quantity: number) => {
+    try {
+      if (!state.user) {
+        throw new Error('Usuário não autenticado');
+      }
 
-3. Área do Funcionário
-   - Lista de pedidos
-   - Atualização de status
-   - Chat com cliente
+      let currentCart = state.cart;
+      if (!currentCart) {
+        currentCart = await carrinhoService.createCarrinho({
+          usuarioId: state.user.id,
+          dataCriacao: new Date().toISOString(),
+          status: 0,
+          itensCarrinho: []
+        });
+        dispatch({ type: 'SET_CART', payload: currentCart });
+      }
 
-## Problemas Conhecidos
-1. Auth0
-   - Estado inválido no login
-   - Refresh token não persistente
+      const item = await itemCarrinhoService.addItemToCart({
+        carrinhoId: currentCart.id,
+        itemId,
+        quantidade: quantity
+      });
 
-2. Performance
-   - Carregamento inicial lento
-   - Otimização de imagens
+      dispatch({ type: 'ADD_TO_CART', payload: item });
+    } catch (error) {
+      console.error('Erro ao adicionar item ao carrinho:', error);
+      throw error;
+    }
+  };
 
-3. UX
-   - Feedback insuficiente
-   - Navegação mobile
+  const removeFromCart = async (itemId: number) => {
+    try {
+      if (!state.cart) return;
+      
+      await itemCarrinhoService.removeItemFromCart(itemId);
+      dispatch({ type: 'REMOVE_FROM_CART', payload: itemId });
+    } catch (error) {
+      console.error('Erro ao remover item do carrinho:', error);
+      throw error;
+    }
+  };
 
-## Decisões Pendentes
-1. Provedor de Pagamento
-   - Stripe vs PagSeguro
-   - Integração PIX
+  const getItemQuantity = (itemId: number) => {
+    return state.cart?.itensCarrinho?.find(item => item.itemId === itemId)?.quantidade || 0;
+  };
 
-2. Hospedagem
-   - AWS vs Azure
-   - CDN para imagens
+  const getCartTotal = () => {
+    return state.cart?.itensCarrinho?.reduce((total, item) => {
+      const itemPrice = state.items.find(i => i.id === item.itemId)?.preco || 0;
+      return total + (itemPrice * item.quantidade);
+    }, 0) || 0;
+  };
 
-3. Monitoramento
-   - Sentry vs LogRocket
-   - Métricas de performance
+  return {
+    cart: state.cart,
+    addToCart,
+    removeFromCart,
+    getItemQuantity,
+    getCartTotal
+  };
+};
+```
+
+### useAuth
+```typescript
+const useAuth = () => {
+  const { state, dispatch } = useAppContext();
+  const navigate = useNavigate();
+
+  const login = async () => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      const user = await authService.login();
+      dispatch({ type: 'SET_USER', payload: user });
+      navigate('/');
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: 'Erro ao fazer login' });
+      throw error;
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await authService.logout();
+      dispatch({ type: 'SET_USER', payload: null });
+      dispatch({ type: 'SET_CART', payload: null });
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      throw error;
+    }
+  };
+
+  return {
+    user: state.user,
+    loading: state.loading,
+    error: state.error,
+    login,
+    logout
+  };
+};
+```
+
+## 🔒 Proteção de Rotas
+
+### PrivateRoute
+```typescript
+interface PrivateRouteProps {
+  roles?: string[];
+  children: React.ReactNode;
+}
+
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+```
+
+## 🌐 Fluxo de Autenticação
+
+1. Usuário acessa rota protegida
+2. PrivateRoute verifica autenticação
+3. Se não autenticado, redireciona para login
+4. Auth0 processa autenticação
+5. Callback redireciona de volta
+6. Token é armazenado
+7. Usuário é redirecionado para rota original
+
+## 🛒 Fluxo do Carrinho
+
+1. Usuário adiciona item
+2. Verifica autenticação
+3. Cria carrinho se não existir
+4. Adiciona item ao carrinho
+5. Atualiza estado global
+6. Persiste no backend
+7. Atualiza UI
