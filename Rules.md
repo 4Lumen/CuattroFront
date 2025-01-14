@@ -1,215 +1,212 @@
-# Cline Development Guide - Version 3
+# Guia de Desenvolvimento Cline - Versão 4.0
 
-## Table of Contents
-1. [Core Principles](#core-principles)
-2. [Development Goals](#development-goals)
-3. [Project Lifecycle](#project-lifecycle)
-4. [Memory Management](#memory-management)
-5. [Operating Constraints](#operating-constraints)
-6. [Memory Bank System](#memory-bank-system)
-7. [MCP Integration](#mcp-integration)
-8. [Tools & Capabilities](#tools--capabilities)
-9. [Troubleshooting](#troubleshooting)
-10. [Version History](#version-history)
+## Índice
+1. [Princípios Fundamentais](#princípios-fundamentais)
+2. [Objetivos de Desenvolvimento](#objetivos-de-desenvolvimento)
+3. [Ciclo de Vida do Projeto](#ciclo-de-vida-do-projeto)
+4. [Sistema de Memória](#sistema-de-memória)
+5. [Restrições Operacionais](#restrições-operacionais)
+6. [Sistema de Documentação](#sistema-de-documentação)
+7. [Ferramentas e Capacidades](#ferramentas-e-capacidades)
+8. [Resolução de Problemas](#resolução-de-problemas)
+9. [Histórico de Versões](#histórico-de-versões)
 
-## Core Principles
-- **Single Source of Truth**: Memory Bank contains all project knowledge
-- **Documentation First**: Complete documentation before development
-- **Change Tracking**: All modifications must be documented
-- **Context Verification**: Always verify context before proceeding
+## Princípios Fundamentais
+- **Documentação como Fonte Única**: Toda informação deve estar documentada
+- **Desenvolvimento Orientado a Contexto**: Entender antes de implementar
+- **Rastreabilidade**: Todas as mudanças devem ser documentadas
+- **Verificação Contínua**: Validar contexto antes de prosseguir
+- **Comunicação Clara**: Mensagens objetivas e em português
 
-## Development Goals
-1. Create maintainable software systems
-2. Follow documented development patterns
-3. Maintain complete project context
-4. Ensure reproducible development processes
+## Objetivos de Desenvolvimento
+1. Criar sistemas sustentáveis e escaláveis
+2. Seguir padrões documentados
+3. Manter contexto completo do projeto
+4. Garantir processos reproduzíveis
+5. Priorizar experiência do usuário
 
-## Project Lifecycle
-### 1. Requirements Gathering
-- Identify objectives and use cases
-- Define success criteria and constraints
-- Document functional and non-functional requirements
+## Ciclo de Vida do Projeto
 
-### 2. Data Modeling
-- Identify core entities and relationships
-- Create appropriate data structures
-- Develop database schema or class diagrams
+### 1. Levantamento de Requisitos
+- Identificar objetivos e casos de uso
+- Definir critérios de sucesso
+- Documentar requisitos funcionais/não-funcionais
+- Estabelecer restrições técnicas e de negócio
 
-### 3. Development Workflow
-#### Initialization
-- Verify Memory Bank files
-- Create missing documentation
-- Read and verify complete context
+### 2. Modelagem
+- Identificar entidades e relacionamentos
+- Criar estruturas de dados apropriadas
+- Desenvolver diagramas de classe/banco
+- Definir contratos de API
 
-#### Execution
-- Analyze task requirements
-- Break down into achievable goals
-- Use tools sequentially for each goal
-- Document all changes and progress
+### 3. Fluxo de Desenvolvimento
 
-#### Error Handling
-- Detect and document ambiguities
-- Request clarification when needed
-- Update documentation with clarified information
+#### Inicialização
+1. Verificar arquivos de documentação
+2. Criar documentação faltante
+3. Ler e validar contexto completo
+4. Confirmar entendimento do problema
 
-## Memory Management
-### Short-Term Memory
-- Track current task context
-- Maintain recent actions and next steps
-- Document open questions and temporary notes
+#### Execução
+1. Analisar requisitos da tarefa
+2. Dividir em objetivos alcançáveis
+3. Usar ferramentas sequencialmente
+4. Documentar alterações e progresso
+5. Validar resultados
 
-### Documentation Standards
-- Maintain version control
-- Use consistent formatting
-- Include diagrams and visual aids
-- Document assumptions and decisions
+#### Tratamento de Erros
+1. Detectar e documentar ambiguidades
+2. Solicitar esclarecimentos quando necessário
+3. Atualizar documentação com informações
+4. Implementar correções
+5. Validar solução
 
-## Operating Constraints
-1. Memory resets require complete documentation
-2. Tools must be used sequentially
-3. Each tool use requires confirmation
-4. Development must follow documented patterns
-5. Do not ask to run commands in terminal, just run them
-6. Never use '&&' on terminal. Always use ';' instead (IMPORTANT)
-7. Keep the LLM running while terminal commands are executing to maintain context and enable real-time interaction
-8. Always proceed while running - do not wait for terminal commands to complete before continuing other work
+## Sistema de Memória
 
-## Memory Bank System
-### Required Files
-| File | Purpose |
-|------|---------|
-| productContext.md | Project purpose and problem space |
-| activeContext.md | Current work and next steps |
-| systemPatterns.md | Technical architecture and decisions |
-| techContext.md | Technology stack and setup |
-| progress.md | Current status and remaining work |
+### Memória de Curto Prazo
+- Rastrear contexto atual
+- Manter ações recentes
+- Documentar próximos passos
+- Registrar dúvidas temporárias
 
-### Core Workflows
-#### Starting Tasks
-1. Check for Memory Bank files
-2. If ANY files missing, stop and create them
-3. Read ALL files before proceeding
-4. Verify complete context
-5. Begin development
+### Padrões de Documentação
+- Manter versionamento
+- Usar formatação consistente
+- Incluir exemplos práticos
+- Documentar decisões técnicas
 
-#### During Development
-1. Follow Memory Bank patterns
-2. Update docs after significant changes
-3. For troubleshooting:
-   - Perform confidence checks (0-10)
-   - If confidence < 9, document:
-     * What you know
-     * What you're unsure about
-     * What needs investigation
-   - Only proceed when confidence ≥ 9
-   - Document findings for future reference
+## Restrições Operacionais
+1. Reset de memória requer documentação completa
+2. Ferramentas devem ser usadas sequencialmente
+3. Cada uso de ferramenta requer confirmação
+4. Desenvolvimento deve seguir padrões
+5. Executar comandos diretamente (sem perguntar)
+6. Usar ';' em vez de '&&' no terminal
+7. Manter contexto durante execução de comandos
+8. Continuar trabalho durante execução de comandos
 
-## MCP Integration
-### Key Concepts
-- **Tools**: Functions Cline can execute through MCP
-- **Resources**: Read-only data access points
-- **Security**: Isolated credentials and explicit user approval
+## Sistema de Documentação
 
-### Use Cases
-1. Web Services and API Integration
-2. Browser Automation
-3. Database Queries
-4. Project and Task Management
-5. Codebase Documentation
+### Arquivos Obrigatórios
+| Arquivo | Propósito |
+|---------|-----------|
+| productContext.md | Contexto e escopo do produto |
+| activeContext.md | Trabalho atual e próximos passos |
+| systemPatterns.md | Arquitetura e decisões técnicas |
+| progress.md | Status e trabalho restante |
 
-## Tools & Capabilities
+### Estrutura dos Arquivos
 
-### File Operations
-- **write_to_file**: Create or overwrite files with complete content
-  - Use for new files or complete rewrites
-  - Always provide full file content
-  - Example: Creating configuration files or templates
+#### productContext.md
+```markdown
+# Nome do Produto
+## Visão Geral
+## Objetivos
+## Casos de Uso
+## Critérios de Sucesso
+## Restrições
+```
 
-- **read_file**: Read file contents
-  - Use to examine existing files
-  - Handles text, PDF, and DOCX files
-  - Example: Reading configuration or source code files
+#### activeContext.md
+```markdown
+# Contexto Ativo
+## Status Atual
+## Trabalho em Andamento
+## Próximos Passos
+## Problemas Conhecidos
+## Decisões Pendentes
+```
 
-- **replace_in_file**: Make targeted edits using SEARCH/REPLACE blocks
-  - Use for precise, line-based modifications
-  - Requires exact line matches
-  - Example: Updating specific function implementations
+#### systemPatterns.md
+```markdown
+# Padrões do Sistema
+## Arquitetura
+## Padrões de Código
+## Padrões de API
+## Padrões de Teste
+## Padrões de Deploy
+```
 
-- **search_files**: Search using regex across files
-  - Use for finding patterns or specific content
-  - Provides context-rich results
-  - Example: Finding all TODO comments in a project
+#### progress.md
+```markdown
+# Progresso do Projeto
+## Concluído
+## Em Andamento
+## Próximos Passos
+## Métricas
+## Impedimentos
+## Riscos
+```
 
-- **list_files**: List directory contents
-  - Use to explore project structure
-  - Supports recursive listing
-  - Example: Listing all TypeScript files in a directory
+### Fluxos Principais
 
-### Terminal Operations
-- **execute_command**: Run CLI commands
-  - Use for system operations and development tasks
-  - Always explain the command's purpose
-  - Example: Running build commands or starting servers
-  - Best Practices:
-    * Use ';' instead of '&&' for command chaining
-    * Keep commands simple and focused
-    * Avoid interactive commands when possible
+#### Iniciando Tarefas
+1. Verificar arquivos de documentação
+2. Se QUALQUER arquivo faltar, criar
+3. Ler TODOS os arquivos
+4. Verificar contexto completo
+5. Iniciar desenvolvimento
 
-- **list_code_definition_names**: List code definitions
-  - Use to understand codebase structure
-  - Provides high-level overview of code constructs
-  - Example: Listing all classes and functions in a directory
+#### Durante Desenvolvimento
+1. Seguir padrões documentados
+2. Atualizar docs após mudanças
+3. Para troubleshooting:
+   - Realizar verificações (0-10)
+   - Se confiança < 9, documentar:
+     * O que é conhecido
+     * O que é incerto
+     * O que precisa investigação
+   - Só prosseguir com confiança ≥ 9
+   - Documentar descobertas
 
-### MCP Tools
-- **use_mcp_tool**: Use MCP server tools
-  - Use for extended capabilities through MCP servers
-  - Requires server name and tool parameters
-  - Example: Using weather API tools
+## Ferramentas e Capacidades
 
-- **access_mcp_resource**: Access MCP resources
-  - Use to read data from MCP servers
-  - Provides read-only access to resources
-  - Example: Accessing database records
+### Operações de Arquivo
+- **write_to_file**: Criar/sobrescrever arquivos
+- **read_file**: Ler conteúdo de arquivos
+- **replace_in_file**: Edições específicas
+- **search_files**: Busca com regex
+- **list_files**: Listar diretório
 
-### Interaction Tools
-- **ask_followup_question**: Request clarification
-  - Use when additional information is needed
-  - Keep questions specific and actionable
-  - Example: Asking for API credentials
+### Operações de Terminal
+- **execute_command**: Executar comandos
+  - Usar ';' para encadear comandos
+  - Manter comandos simples
+  - Evitar comandos interativos
 
-- **attempt_completion**: Present final results
-  - Use to conclude tasks
-  - Must include complete results
-  - Example: Presenting a completed feature implementation
+### Ferramentas de Interação
+- **ask_followup_question**: Pedir esclarecimentos
+- **attempt_completion**: Apresentar resultados
 
-### Tool Usage Guidelines
-1. Use one tool at a time
-2. Wait for confirmation before proceeding
-3. Document tool usage in progress.md
-4. Handle errors gracefully
-5. Use the simplest tool that can accomplish the task
-6. Prefer targeted edits over complete rewrites
-7. Always verify tool results before continuing
+### Diretrizes de Uso
+1. Uma ferramenta por vez
+2. Aguardar confirmação
+3. Documentar uso
+4. Tratar erros
+5. Usar ferramenta mais simples
+6. Preferir edições específicas
 
-## Troubleshooting
-### Common Issues
-1. Missing context
-2. Tool execution failures
-3. Memory Bank inconsistencies
-4. MCP connection problems
+## Resolução de Problemas
 
-### Resolution Process
-1. Identify the issue
-2. Check relevant documentation
-3. Verify system state
-4. Document findings
-5. Implement solution
-6. Update documentation
+### Problemas Comuns
+1. Contexto incompleto
+2. Falha em ferramentas
+3. Inconsistência na documentação
+4. Erros de execução
 
-## Version History
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2023-10-01 | Initial version |
-| 2.0 | 2023-10-15 | Restructured content, added TOC, improved formatting |
-| 3.0 | 2023-11-01 | Added terminal command execution rules |
-| 4.0 | 2024-01-15 | Enhanced tool descriptions and usage guidelines |
+### Processo de Resolução
+1. Identificar problema
+2. Verificar documentação
+3. Validar estado
+4. Documentar achados
+5. Implementar solução
+6. Atualizar documentação
+
+## Histórico de Versões
+| Versão | Data | Mudanças |
+|--------|------|----------|
+| 1.0 | 2023-10-01 | Versão inicial |
+| 2.0 | 2023-10-15 | Reestruturação e TOC |
+| 3.0 | 2023-11-01 | Regras de terminal |
+| 4.0 | 2024-01-15 | Melhorias ferramentas |
+| 4.1 | 2024-03-20 | Estrutura de documentação |

@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 interface ProtectedRouteProps {
-  children: JSX.Element;
+  children: React.ReactNode;
   requiredRole?: number;
 }
 
@@ -18,7 +18,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

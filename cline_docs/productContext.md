@@ -1,72 +1,43 @@
-# Product Context
+# Contexto do Produto - Cuattro
 
-## Business Overview
-The Cuattro system provides a complete buffet management solution, combining a modern React frontend with a robust .NET backend. It enables efficient order processing, user management, and menu administration through an intuitive interface.
+## Visão Geral
+Sistema de gerenciamento de buffet desenvolvido para otimizar pedidos e operações.
 
-## Core Features
+## Objetivos
+1. Simplificar o processo de pedidos para clientes
+2. Melhorar a gestão de estoque e cardápio
+3. Facilitar o trabalho dos funcionários
+4. Fornecer insights através de relatórios
 
-### User Management
-- Role-based access control (Administrador, Cliente, Empregado)
-- Secure authentication via Auth0
-- User profile management
-- Password recovery and account security
+## Casos de Uso
+### Cliente
+- Visualizar cardápio atualizado
+- Realizar pedidos online
+- Acompanhar status do pedido
+- Gerenciar carrinho de compras
 
-### Menu Management
-- Create, read, update, and delete menu items
-- Detailed item descriptions with images
-- Pricing and inventory management
-- Categorization and organization of items
-- Search and filtering capabilities
-
-### Order Processing
-- Interactive shopping cart
-- Real-time order status tracking (Criado > Pago > EmProducao > Entregue)
-- Delivery information management
-- Order history and receipts
-- Payment integration
-
-### Reporting and Analytics
-- Sales tracking and reporting
-- Popular item analysis
-- User activity monitoring
-- Real-time dashboard
-- Exportable reports
-
-## Business Benefits
-- Streamlined order processing
-- Improved customer experience through responsive UI
-- Enhanced operational efficiency with real-time updates
-- Data-driven decision making with analytics
-- Scalable architecture for future growth
-- Reduced operational costs through automation
-
-## User Roles
+### Funcionário
+- Receber pedidos em tempo real
+- Atualizar status de preparação
+- Gerenciar entregas
+- Comunicar com clientes
 
 ### Administrador
-- Full system access and configuration
-- User management and role assignment
-- Menu configuration and pricing
-- Access to all reports and analytics
-- System settings management
+- Gerenciar cardápio e preços
+- Controlar estoque
+- Administrar usuários
+- Analisar relatórios
 
-### Cliente
-- Browse and search menu items
-- Create and manage orders
-- View order history and receipts
-- Manage account settings
-- Track order status in real-time
+## Critérios de Sucesso
+1. Interface intuitiva e responsiva
+2. Tempo de resposta < 2 segundos
+3. Disponibilidade 99.9%
+4. Segurança dos dados
+5. Escalabilidade do sistema
 
-### Empregado
-- Process and update orders
-- Manage order preparation and delivery
-- View assigned tasks and orders
-- Access order history
-- Update inventory status
-
-## Technology Benefits
-- Modern, responsive user interface
-- Real-time updates and notifications
-- Secure authentication and data protection
-- Scalable cloud-based architecture
-- Comprehensive API for integrations
-- Automated testing and CI/CD pipeline
+## Restrições
+1. Compatibilidade com navegadores modernos
+2. Conformidade com LGPD
+3. Integração com sistemas existentes
+4. Limitações de orçamento
+5. Prazo de entrega

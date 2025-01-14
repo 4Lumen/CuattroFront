@@ -8,8 +8,30 @@
 - React Router for navigation
 - Context API for state management
 - Axios for API communication
+- Testing Setup:
+  * Jest with ts-jest for TypeScript support
+  * React Testing Library for component testing
+  * Custom Jest configuration for ES modules support
+  * Transform rules for handling axios and other dependencies
+  * Setup files for test environment configuration
+- ESLint and Prettier for code quality
+# Technical Context
+
+## Full Stack Technologies
+
+### Frontend
+- React 18 with TypeScript
+- Tailwind CSS for styling
+- React Router for navigation
+- Context API for state management
+- Axios for API communication
 - React Testing Library for testing
 - ESLint and Prettier for code quality
+- Order Tracking Features:
+  * Real-time status updates
+  * Responsive table layout
+  * Type-safe status transitions
+  * Error handling and loading states
 
 ### Backend
 - .NET 9.0

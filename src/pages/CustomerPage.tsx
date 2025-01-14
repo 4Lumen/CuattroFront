@@ -1,122 +1,150 @@
-import React, { useEffect, useState } from 'react';
-import ItemService from '../services/itemService';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Grid, Container, CircularProgress, Alert, Button } from '@mui/material';
+import { useCart } from '../hooks/useCart';
 import { useAppContext } from '../context/AppContext';
-import { useCart } from '../context/CartContext';
-import CarrinhoService from '../services/carrinhoService';
-import ItemCarrinhoService from '../services/itemCarrinhoService';
+import { Item } from '../types';
+import itemService from '../services/itemService';
+import MenuFilter from '../components/MenuFilter';
+import MenuItem from '../components/MenuItem';
+import { AxiosError } from 'axios';
 
 const CustomerPage: React.FC = () => {
-  const [items, setItems] = useState<any[]>([]);
-  interface CartItem {
-    id: number;
-    nome: string;
-    descricao: string;
-    preco: number;
-    quantidade: number;
-    imagemUrl?: string;
-  }
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const { state, dispatch } = useAppContext();
-  const { state: cartState, dispatch: cartDispatch } = useCart();
+  const { addToCart, removeFromCart, getItemQuantity } = useCart();
+
+  const fetchItems = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const items = await itemService.getItems();
+      if (Array.isArray(items)) {
+        dispatch({ type: 'SET_ITEMS', payload: items });
+      } else {
+        throw new Error('Formato de dados inválido');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar itens:', error);
+      if (error instanceof AxiosError) {
+        if (error.code === 'ECONNABORTED') {
+          setError('A conexão expirou. Por favor, tente novamente.');
+        } else if (error.response) {
+          setError(`Erro ${error.response.status}: ${error.response.data.message || 'Erro desconhecido'}`);
+        } else if (error.request) {
+          setError('Não foi possível conectar ao servidor. Verifique sua conexão.');
+        } else {
+          setError(error.message);
+        }
+      } else if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Erro ao carregar os itens. Por favor, tente novamente mais tarde.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch]);
 
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const data = await ItemService.getItems();
-        setItems(data);
-      } catch (error) {
-        console.error('Error fetching items:', error);
-      }
-    };
-
     fetchItems();
-  }, []);
+  }, [fetchItems]);
 
-  const handleAddToCart = async (item: any) => {
+  const filteredItems = selectedCategory === 'Todos'
+    ? state.items
+    : state.items.filter(item => item.categoria === selectedCategory);
+
+  const handleAddToCart = async (item: Item) => {
     try {
-      // Check if user has an active cart
-      let carrinho = state.cart;
-      if (!carrinho && state.user?.id) {
-        // Create new cart if none exists
-        carrinho = await CarrinhoService.createCarrinho({
-          usuarioId: state.user.id,
-          dataCriacao: new Date().toISOString(),
-          status: 0 // Active status
-        });
-        dispatch({ type: 'ADD_TO_CART', payload: carrinho });
-      } else if (!state.user?.id) {
-        console.error('User ID is required to create a cart');
-        return;
-      }
-
-      if (!carrinho) {
-        console.error('No cart available');
-        return;
-      }
-
-      // Add item to cart
-      await ItemCarrinhoService.addItemToCart({
-        carrinhoId: carrinho.id,
-        itemId: item.id,
-        quantidade: 1
-      });
-
-      cartDispatch({ type: 'ADD_ITEM', payload: item });
+      setError(null);
+      await addToCart(item, 1);
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Erro ao adicionar item ao carrinho');
+      }
     }
   };
 
+  const handleRemoveFromCart = async (itemId: number) => {
+    try {
+      setError(null);
+      await removeFromCart(itemId);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Erro ao remover item do carrinho');
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <Container className="flex items-center justify-center min-h-screen">
+        <CircularProgress />
+      </Container>
+    );
+  }
+
   return (
-    <div className="customer-page">
-      <h2>Customer Ordering</h2>
-      <div className="menu-container">
-        {items.map(item => (
-          <div key={item.id} className="menu-item">
-            <img src={item.imagemUrl} alt={item.nome} className="item-image" />
-            <div className="item-details">
-              <h3>{item.nome}</h3>
-              <p>{item.descricao}</p>
-              <p className="price">R${item.preco.toFixed(2)}</p>
-              <button 
-                onClick={() => handleAddToCart(item)}
-                className="add-to-cart"
-              >
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      <div className="cart-container">
-        <h3>Your Cart</h3>
-        {cartState.items.length > 0 ? (
-          <>
-            <ul>
-              {cartState.items.map((cartItem) => (
-                <li key={cartItem.item.id} className="cart-item">
-                  <span>{cartItem.item.nome}</span>
-                  <span>Qty: {cartItem.quantity}</span>
-                  <span>R${(cartItem.item.preco * cartItem.quantity).toFixed(2)}</span>
-                  <button 
-                    onClick={() => cartDispatch({ type: 'REMOVE_ITEM', payload: cartItem.item.id })}
-                    className="remove-item"
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div className="cart-total">
-              Total: R${cartState.total.toFixed(2)}
-            </div>
-          </>
-        ) : (
-          <p>Your cart is empty</p>
-        )}
-      </div>
-    </div>
+    <Container maxWidth="lg" className="py-8">
+      {error && (
+        <Alert 
+          severity="error" 
+          className="mb-4" 
+          action={
+            <Button color="inherit" size="small" onClick={fetchItems}>
+              Tentar Novamente
+            </Button>
+          }
+        >
+          {error}
+        </Alert>
+      )}
+
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={3}>
+          <MenuFilter
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+        </Grid>
+        <Grid item xs={12} md={9}>
+          <Grid container spacing={3}>
+            {filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
+                <Grid item xs={12} sm={6} md={4} key={item.id}>
+                  <MenuItem
+                    item={item}
+                    quantity={getItemQuantity(item.id)}
+                    onAdd={() => handleAddToCart(item)}
+                    onRemove={() => handleRemoveFromCart(item.id)}
+                  />
+                </Grid>
+              ))
+            ) : (
+              <Grid item xs={12}>
+                <Alert 
+                  severity="info"
+                  action={
+                    error && (
+                      <Button color="inherit" size="small" onClick={fetchItems}>
+                        Tentar Novamente
+                      </Button>
+                    )
+                  }
+                >
+                  {error ? 'Não foi possível carregar os itens.' : 'Nenhum item encontrado nesta categoria.'}
+                </Alert>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

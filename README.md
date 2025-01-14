@@ -1,108 +1,141 @@
-# Buffet Ordering System - Technical Documentation
+# Buffet App
 
-## Table of Contents
-1. [System Overview](#system-overview)
-2. [Technical Architecture](#technical-architecture)
-3. [Core Features](#core-features)
-4. [Development Setup](#development-setup)
-5. [API Integration](#api-integration)
-6. [State Management](#state-management)
-7. [Security Considerations](#security-considerations)
-8. [Testing Strategy](#testing-strategy)
-9. [Deployment](#deployment)
+## 📝 Descrição
+Aplicação web para gerenciamento de pedidos de buffet, desenvolvida com React, TypeScript, Material-UI e Tailwind CSS.
 
-## System Overview
-A modern React application built with TypeScript for managing buffet orders. The system provides three distinct interfaces:
-- **Customer Interface**: Order placement and tracking
-- **Admin Interface**: Menu and inventory management
-- **Employee Interface**: Order processing and fulfillment
+## 🚀 Funcionalidades
 
-## Technical Architecture
-### Frontend
-- React 18 with TypeScript
-- React Router 6 for navigation
-- Context API for state management
-- Axios for API communication
+### Para Clientes
+- Visualização do cardápio com categorias
+- Carrinho de compras
+- Sistema de autenticação
+- Acompanhamento de pedidos
 
-### Backend Integration
-- REST API integration following BackEndSwaggerModel.json
-- JWT-based authentication
-- Role-based access control
+### Para Funcionários
+- Gerenciamento de pedidos
+- Atualização de status
+- Controle de entregas
 
-## Core Features
-### Customer Interface
-- **Menu Browsing**: View available buffet items with details
-- **Cart Management**: Add/remove items, adjust quantities
-- **Order Placement**: Submit and track orders
-- **Order History**: View past orders and status
+### Para Administradores
+- Gestão completa do cardápio
+- Gerenciamento de usuários
+- Relatórios e análises
 
-### Admin Interface
-- **Menu Management**: CRUD operations for buffet items
-- **Inventory Control**: Update stock levels
-- **Pricing Management**: Adjust item prices
-- **Reporting**: View sales and order statistics
+## 🛠️ Tecnologias
 
-### Employee Interface
-- **Order Queue**: View incoming orders
-- **Order Status**: Update preparation status
-- **Notifications**: Real-time order updates
+- React
+- TypeScript
+- Material-UI
+- Tailwind CSS
+- React Router
+- Context API
 
-## Development Setup
-### Prerequisites
-- Node.js v16+
-- npm v8+
+## 🎨 Design System
 
-### Installation
+### Cores
+- **Primária**: Rosa (#FF6B6B)
+- **Secundária**: Turquesa (#4ECDC4)
+- **Tons de Cinza**: Escala personalizada
+- Suporte a modo escuro
+
+### Componentes
+- Cards com sombras e animações
+- Botões interativos
+- Filtros de categoria
+- Layout responsivo
+
+## 🏗️ Estrutura do Projeto
+
+```
+src/
+├── components/      # Componentes reutilizáveis
+├── context/        # Contextos da aplicação
+├── hooks/          # Hooks personalizados
+├── pages/          # Páginas da aplicação
+├── services/       # Serviços e APIs
+├── types/          # Tipos e interfaces
+└── theme.ts        # Configuração do tema
+```
+
+## 💻 Pré-requisitos
+
+- Node.js (versão 14 ou superior)
+- npm ou yarn
+
+## 🚀 Instalação
+
+1. Clone o repositório
+```bash
+git clone [url-do-repositorio]
+```
+
+2. Instale as dependências
 ```bash
 npm install
+# ou
+yarn install
 ```
 
-### Running the Application
+3. Inicie o servidor de desenvolvimento
 ```bash
 npm start
+# ou
+yarn start
 ```
 
-### Environment Variables
-Create `.env` file with:
+## 🔒 Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto:
+
 ```env
-REACT_APP_API_URL=http://localhost:5000/api
-REACT_APP_AUTH_TOKEN_KEY=authToken
+REACT_APP_API_URL=sua_url_api
+REACT_APP_AUTH0_DOMAIN=seu_dominio_auth0
+REACT_APP_AUTH0_CLIENT_ID=seu_client_id_auth0
 ```
 
-## API Integration
-The application integrates with the backend API following the specifications in BackEndSwaggerModel.json. Key endpoints include:
+## 📦 Estrutura de Dados
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| /api/items | GET | Get all menu items |
-| /api/orders | POST | Create new order |
-| /api/orders/{id} | GET | Get order details |
-| /api/auth/login | POST | User authentication |
-
-## State Management
-The application uses React Context API for state management with the following contexts:
-- **AppContext**: Global application state
-- **AuthContext**: Authentication state
-- **CartContext**: Shopping cart state
-
-## Security Considerations
-- JWT token storage in secure HTTP-only cookies
-- Role-based access control
-- Input validation on all forms
-- API request sanitization
-
-## Testing Strategy
-- Unit tests with Jest
-- Component tests with React Testing Library
-- End-to-end tests with Cypress
-
-## Deployment
-### Production Build
-```bash
-npm run build
+### User
+```typescript
+interface User {
+  id: string;
+  nome: string;
+  email: string;
+  role: Role;
+}
 ```
 
-### Deployment Requirements
-- Node.js server
-- Reverse proxy (Nginx/Apache)
-- SSL/TLS configuration
+### Item
+```typescript
+interface Item {
+  id: number;
+  nome: string;
+  descricao: string;
+  preco: number;
+  imagemUrl: string;
+  categoria: string;
+}
+```
+
+### Carrinho
+```typescript
+interface Carrinho {
+  id: number;
+  usuarioId: string;
+  dataCriacao: string;
+  status: Status;
+  itensCarrinho: ItemCarrinho[];
+}
+```
+
+## 🤝 Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
