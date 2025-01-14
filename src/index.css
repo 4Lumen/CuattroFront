@@ -1,13 +1,119 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-50: #FFF5F5;
+  --primary-100: #FFE3E3;
+  --primary-200: #FFC9C9;
+  --primary-300: #FFA8A8;
+  --primary-400: #FF8787;
+  --primary-500: #FF6B6B;
+  --primary-600: #FA5252;
+  --primary-700: #F03E3E;
+  --primary-800: #E03131;
+  --primary-900: #C92A2A;
+
+  --secondary-50: #E3FAFC;
+  --secondary-100: #C5F6FA;
+  --secondary-200: #99E9F2;
+  --secondary-300: #66D9E8;
+  --secondary-400: #3BC9DB;
+  --secondary-500: #22B8CF;
+  --secondary-600: #15AABF;
+  --secondary-700: #1098AD;
+  --secondary-800: #0C8599;
+  --secondary-900: #0B7285;
+
+  --gray-50: #F8F9FA;
+  --gray-100: #F1F3F5;
+  --gray-200: #E9ECEF;
+  --gray-300: #DEE2E6;
+  --gray-400: #CED4DA;
+  --gray-500: #ADB5BD;
+  --gray-600: #868E96;
+  --gray-700: #495057;
+  --gray-800: #343A40;
+  --gray-900: #212529;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-500);
+}
+
+/* Preferência de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gray-50: #212529;
+    --gray-100: #343A40;
+    --gray-200: #495057;
+    --gray-300: #868E96;
+    --gray-400: #ADB5BD;
+    --gray-500: #CED4DA;
+    --gray-600: #DEE2E6;
+    --gray-700: #E9ECEF;
+    --gray-800: #F1F3F5;
+    --gray-900: #F8F9FA;
+  }
+
+  body {
+    @apply bg-gray-900 text-gray-50;
+  }
 }

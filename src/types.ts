@@ -4,6 +4,7 @@ export interface Item {
   descricao: string | null;
   preco: number;
   imagemUrl: string | null;
+  categoria: string;
 }
 
 export interface Carrinho {
@@ -21,6 +22,7 @@ export interface ItemCarrinho {
   carrinhoId: number;
   itemId: number;
   quantidade: number;
+  item?: Item;
 }
 
 export enum Status {
@@ -51,7 +53,8 @@ export interface Auth0User {
   nickname?: string;
   email?: string;
   picture?: string;
-  'https://buffet-app.com/roles'?: number[];
+  'https://api.cuattro.4lumen.com/roles'?: number[];
+  [key: string]: any;
 }
 
 export interface AuthConfig {
@@ -59,3 +62,16 @@ export interface AuthConfig {
   clientId: string;
   redirectUri: string;
 }
+
+export interface AppState {
+  user: User | null;
+  cart: Carrinho | null;
+  items: Item[];
+}
+
+export type AppAction =
+  | { type: 'SET_USER'; payload: User | null }
+  | { type: 'SET_CART'; payload: Carrinho | null }
+  | { type: 'ADD_TO_CART'; payload: { item: Item; quantity: number } }
+  | { type: 'REMOVE_FROM_CART'; payload: number }
+  | { type: 'SET_ITEMS'; payload: Item[] };
