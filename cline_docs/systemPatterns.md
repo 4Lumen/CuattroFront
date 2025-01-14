@@ -1,191 +1,215 @@
-# Padrões do Sistema - Cuattro
+# Padrões do Sistema
 
-## Arquitetura
+## 🎨 Design System
 
-### Frontend
-1. Componentes React
-   - Funcionais com TypeScript
-   - Props tipadas e documentadas
-   - Hooks customizados para lógica
-   - Testes unitários
+### Cores
+```css
+/* Primárias */
+--primary-50: #FFF5F5;
+--primary-100: #FFE3E3;
+--primary-200: #FFC9C9;
+--primary-300: #FFA8A8;
+--primary-400: #FF8787;
+--primary-500: #FF6B6B;  /* Base */
+--primary-600: #FA5252;
+--primary-700: #F03E3E;
+--primary-800: #E03131;
+--primary-900: #C92A2A;
 
-2. Gerenciamento de Estado
-   - Context API para estado global
-   - Hooks para estado local
-   - Reducers para lógica complexa
+/* Secundárias */
+--secondary-50: #E3FAFC;
+--secondary-100: #C5F6FA;
+--secondary-200: #99E9F2;
+--secondary-300: #66D9E8;
+--secondary-400: #3BC9DB;
+--secondary-500: #22B8CF;  /* Base */
+--secondary-600: #15AABF;
+--secondary-700: #1098AD;
+--secondary-800: #0C8599;
+--secondary-900: #0B7285;
 
-3. Roteamento
-   - React Router v6
-   - Lazy loading de rotas
-   - Proteção por roles
+/* Tons de Cinza */
+--gray-50: #F8F9FA;
+--gray-100: #F1F3F5;
+--gray-200: #E9ECEF;
+--gray-300: #DEE2E6;
+--gray-400: #CED4DA;
+--gray-500: #ADB5BD;
+--gray-600: #868E96;
+--gray-700: #495057;
+--gray-800: #343A40;
+--gray-900: #212529;
+```
 
-### Backend
-1. API REST
-   - Controllers CRUD
-   - DTOs para transferência
-   - Validação de modelos
-   - Documentação Swagger
+### Tipografia
+```css
+/* Família */
+font-family: 'Inter', sans-serif;
 
-2. Banco de Dados
-   - Code First com EF Core
-   - Migrations versionadas
-   - Índices otimizados
+/* Tamanhos */
+--text-xs: 0.75rem;    /* 12px */
+--text-sm: 0.875rem;   /* 14px */
+--text-base: 1rem;     /* 16px */
+--text-lg: 1.125rem;   /* 18px */
+--text-xl: 1.25rem;    /* 20px */
+--text-2xl: 1.5rem;    /* 24px */
+--text-3xl: 1.875rem;  /* 30px */
+--text-4xl: 2.25rem;   /* 36px */
 
-3. Autenticação
-   - JWT via Auth0
-   - Refresh tokens
-   - RBAC
+/* Pesos */
+--font-light: 300;
+--font-normal: 400;
+--font-medium: 500;
+--font-semibold: 600;
+--font-bold: 700;
+```
 
-## Padrões de Código
+### Espaçamento
+```css
+/* Escala de 4px */
+--space-1: 0.25rem;   /* 4px */
+--space-2: 0.5rem;    /* 8px */
+--space-3: 0.75rem;   /* 12px */
+--space-4: 1rem;      /* 16px */
+--space-6: 1.5rem;    /* 24px */
+--space-8: 2rem;      /* 32px */
+--space-12: 3rem;     /* 48px */
+--space-16: 4rem;     /* 64px */
+```
 
-### Nomenclatura
-1. Componentes
-   ```typescript
-   // PascalCase para componentes
-   const UserProfile: React.FC<UserProfileProps> = () => {};
-   
-   // camelCase para hooks
-   const useCart = () => {};
-   
-   // UPPER_CASE para constantes
-   const API_URL = process.env.REACT_APP_API_URL;
-   ```
+### Sombras
+```css
+--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+--shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+```
 
-2. Arquivos
-   ```
-   components/
-   ├── UserProfile.tsx
-   ├── OrderList.tsx
-   └── CartItem.tsx
-   ```
+### Bordas
+```css
+--radius-sm: 0.125rem;  /* 2px */
+--radius: 0.25rem;      /* 4px */
+--radius-md: 0.375rem;  /* 6px */
+--radius-lg: 0.5rem;    /* 8px */
+--radius-xl: 0.75rem;   /* 12px */
+--radius-2xl: 1rem;     /* 16px */
+--radius-full: 9999px;
+```
 
-3. Estilos
-   ```css
-   /* Tailwind + BEM */
-   .card {}
-   .card__header {}
-   .card__content {}
-   ```
+## 🧱 Componentes
 
-### Estrutura de Componentes
+### Botões
 ```typescript
-// Imports
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+// Variantes
+type ButtonVariant = 'contained' | 'outlined' | 'text';
 
-// Types
-interface Props {
-  data: Type;
-  onAction: () => void;
+// Tamanhos
+type ButtonSize = 'small' | 'medium' | 'large';
+
+// Cores
+type ButtonColor = 'primary' | 'secondary' | 'error' | 'success' | 'warning';
+```
+
+### Cards
+```typescript
+// Variantes
+type CardVariant = 'elevation' | 'outlined';
+
+// Props
+interface CardProps {
+  variant?: CardVariant;
+  elevation?: number;
+  className?: string;
+  children: React.ReactNode;
 }
+```
 
-// Component
-const Component: React.FC<Props> = ({ data, onAction }) => {
-  // Hooks
-  const navigate = useNavigate();
+### Inputs
+```typescript
+// Variantes
+type InputVariant = 'outlined' | 'filled' | 'standard';
 
-  // State
-  const [state, setState] = useState();
+// Props
+interface InputProps {
+  label: string;
+  error?: string;
+  helperText?: string;
+  required?: boolean;
+  disabled?: boolean;
+}
+```
 
-  // Effects
-  useEffect(() => {}, []);
+## 📱 Breakpoints
 
-  // Handlers
-  const handleClick = () => {};
-
-  // Render
-  return <div />;
+```typescript
+const breakpoints = {
+  xs: '0px',
+  sm: '600px',
+  md: '960px',
+  lg: '1280px',
+  xl: '1920px'
 };
 
-export default Component;
+// Uso com Tailwind
+// sm: min-width: 600px
+// md: min-width: 960px
+// lg: min-width: 1280px
+// xl: min-width: 1920px
 ```
 
-## Padrões de API
+## 🎭 Animações
 
-### Endpoints
-```typescript
-// GET /api/items
-// POST /api/items
-// GET /api/items/{id}
-// PUT /api/items/{id}
-// DELETE /api/items/{id}
-```
-
-### Respostas
-```typescript
-// Sucesso
-{
-  success: true,
-  data: T,
-  message?: string
+```css
+/* Fade */
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+.fade-exit {
+  opacity: 1;
+}
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
 }
 
-// Erro
-{
-  success: false,
-  error: {
-    code: string,
-    message: string,
-    details?: any
+/* Slide */
+.slide-enter {
+  transform: translateX(100%);
+}
+.slide-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease-in;
+}
+.slide-exit {
+  transform: translateX(0);
+}
+.slide-exit-active {
+  transform: translateX(-100%);
+  transition: transform 300ms ease-out;
+}
+```
+
+## 🌗 Modo Escuro
+
+```typescript
+// Cores adaptativas
+const darkTheme = {
+  background: {
+    default: '#121212',
+    paper: '#1E1E1E'
+  },
+  text: {
+    primary: '#FFFFFF',
+    secondary: 'rgba(255, 255, 255, 0.7)'
   }
-}
+};
+
+// Uso com Tailwind
+// dark:bg-gray-900
+// dark:text-white
 ```
-
-## Padrões de Teste
-
-### Unit Tests
-```typescript
-describe('Component', () => {
-  it('should render correctly', () => {});
-  it('should handle user interaction', () => {});
-  it('should manage state properly', () => {});
-});
-```
-
-### Integration Tests
-```typescript
-describe('API', () => {
-  it('should create resource', async () => {});
-  it('should retrieve resource', async () => {});
-  it('should handle errors', async () => {});
-});
-```
-
-## Padrões de Commit
-```bash
-# Tipos
-feat: nova funcionalidade
-fix: correção de bug
-docs: documentação
-style: formatação
-refactor: refatoração
-test: testes
-chore: manutenção
-```
-
-## Padrões de Deploy
-
-### Ambientes
-1. Desenvolvimento
-   - Branch: develop
-   - URL: dev.cuattro.4lumen.com
-
-2. Homologação
-   - Branch: staging
-   - URL: staging.cuattro.4lumen.com
-
-3. Produção
-   - Branch: main
-   - URL: cuattro.4lumen.com
-
-### Pipeline
-1. Build
-   - Lint
-   - Testes
-   - Build
-
-2. Deploy
-   - Backup
-   - Migrations
-   - Deploy
-   - Smoke Tests
