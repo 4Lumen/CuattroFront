@@ -1,32 +1,34 @@
-# Project Progress
+# Progresso do Projeto
 
-## Completed
-- Core API implementation
-  - Item management
-  - Shopping cart operations
-  - User management
-  - Role-based access control
-  - Image upload functionality with MinIO S3
-- Database setup with Entity Framework Core
-- Auth0 authentication integration
-- Swagger API documentation
-- Comprehensive project documentation
+## Funcionalidades Implementadas
 
-## Current Focus
-- Writing unit tests
-- Implementing integration tests
-- Optimizing database queries
-- Enhancing error handling
+### Autenticação
+- [x] Login com Auth0
+- [x] Integração com Google OAuth
+- [x] Gerenciamento de roles (Admin, Funcionário, Cliente)
+- [x] Proteção de rotas baseada em roles
 
-## Future Improvements
-1. Add caching layer for frequently accessed data
-2. Implement rate limiting for API endpoints
-3. Add support for multiple languages
-4. Develop admin dashboard
-5. Create monitoring and logging system
+### Gerenciamento de Itens
+- [x] CRUD completo de itens
+- [x] Upload de imagens para o Minio
+- [x] Interface de administração para itens
+- [x] Edição de itens existentes
+- [x] Visualização em lista com preview de imagens
+- [x] Validação de dados no frontend
+- [x] Formatação de preços em Real (R$)
 
-## Deployment Ready
-- Docker containerization
-- CI/CD pipeline setup
-- Production environment configuration
-- Security hardening
+### Interface do Usuário
+- [x] Layout responsivo
+- [x] Feedback visual de operações (loading, sucesso, erro)
+- [x] Preview de imagens
+- [x] Navegação intuitiva
+- [x] Formulários com validação em tempo real
+
+## Próximos Passos
+- [ ] Implementar exclusão de itens
+- [ ] Adicionar confirmação antes de operações importantes
+- [ ] Melhorar tratamento de erros de upload
+- [ ] Implementar paginação na lista de itens
+- [ ] Adicionar filtros e busca na lista de itens
+- [ ] Implementar cache de imagens
+- [ ] Melhorar performance de carregamento de imagens

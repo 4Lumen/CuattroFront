@@ -1,215 +1,210 @@
 # Padrões do Sistema
 
-## 🎨 Design System
+## Padrões de Arquitetura
 
-### Cores
-```css
-/* Primárias */
---primary-50: #FFF5F5;
---primary-100: #FFE3E3;
---primary-200: #FFC9C9;
---primary-300: #FFA8A8;
---primary-400: #FF8787;
---primary-500: #FF6B6B;  /* Base */
---primary-600: #FA5252;
---primary-700: #F03E3E;
---primary-800: #E03131;
---primary-900: #C92A2A;
+### Frontend
+1. **Component-Based Architecture**
+   - Componentes reutilizáveis
+   - Props tipadas com TypeScript
+   - Composição sobre herança
 
-/* Secundárias */
---secondary-50: #E3FAFC;
---secondary-100: #C5F6FA;
---secondary-200: #99E9F2;
---secondary-300: #66D9E8;
---secondary-400: #3BC9DB;
---secondary-500: #22B8CF;  /* Base */
---secondary-600: #15AABF;
---secondary-700: #1098AD;
---secondary-800: #0C8599;
---secondary-900: #0B7285;
+2. **Context API Pattern**
+   - Estado global distribuído
+   - Providers hierárquicos
+   - Hooks personalizados
 
-/* Tons de Cinza */
---gray-50: #F8F9FA;
---gray-100: #F1F3F5;
---gray-200: #E9ECEF;
---gray-300: #DEE2E6;
---gray-400: #CED4DA;
---gray-500: #ADB5BD;
---gray-600: #868E96;
---gray-700: #495057;
---gray-800: #343A40;
---gray-900: #212529;
-```
+3. **Container/Presenter Pattern**
+   - Separação de lógica e apresentação
+   - Componentes inteligentes vs. apresentacionais
+   - Reusabilidade maximizada
 
-### Tipografia
-```css
-/* Família */
-font-family: 'Inter', sans-serif;
+### Backend
+1. **Clean Architecture**
+   - Camadas bem definidas
+   - Inversão de dependência
+   - Separação de responsabilidades
 
-/* Tamanhos */
---text-xs: 0.75rem;    /* 12px */
---text-sm: 0.875rem;   /* 14px */
---text-base: 1rem;     /* 16px */
---text-lg: 1.125rem;   /* 18px */
---text-xl: 1.25rem;    /* 20px */
---text-2xl: 1.5rem;    /* 24px */
---text-3xl: 1.875rem;  /* 30px */
---text-4xl: 2.25rem;   /* 36px */
+2. **Repository Pattern**
+   - Abstração do acesso a dados
+   - Interface consistente
+   - Testabilidade melhorada
 
-/* Pesos */
---font-light: 300;
---font-normal: 400;
---font-medium: 500;
---font-semibold: 600;
---font-bold: 700;
-```
+3. **Service Layer Pattern**
+   - Lógica de negócio encapsulada
+   - Reutilização de código
+   - Manutenibilidade aprimorada
 
-### Espaçamento
-```css
-/* Escala de 4px */
---space-1: 0.25rem;   /* 4px */
---space-2: 0.5rem;    /* 8px */
---space-3: 0.75rem;   /* 12px */
---space-4: 1rem;      /* 16px */
---space-6: 1.5rem;    /* 24px */
---space-8: 2rem;      /* 32px */
---space-12: 3rem;     /* 48px */
---space-16: 4rem;     /* 64px */
-```
+## Padrões de Design
 
-### Sombras
-```css
---shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
---shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
---shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
---shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
---shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-```
+### UI/UX
+1. **Material Design**
+   - Componentes consistentes
+   - Feedback visual
+   - Animações suaves
 
-### Bordas
-```css
---radius-sm: 0.125rem;  /* 2px */
---radius: 0.25rem;      /* 4px */
---radius-md: 0.375rem;  /* 6px */
---radius-lg: 0.5rem;    /* 8px */
---radius-xl: 0.75rem;   /* 12px */
---radius-2xl: 1rem;     /* 16px */
---radius-full: 9999px;
-```
+2. **Responsive Design**
+   - Mobile-first approach
+   - Breakpoints padronizados
+   - Flexbox/Grid layouts
 
-## 🧱 Componentes
+3. **Progressive Enhancement**
+   - Funcionalidade básica garantida
+   - Recursos avançados opcionais
+   - Fallbacks apropriados
 
-### Botões
-```typescript
-// Variantes
-type ButtonVariant = 'contained' | 'outlined' | 'text';
+### Código
+1. **SOLID Principles**
+   - Single Responsibility
+   - Open/Closed
+   - Liskov Substitution
+   - Interface Segregation
+   - Dependency Inversion
 
-// Tamanhos
-type ButtonSize = 'small' | 'medium' | 'large';
+2. **DRY (Don't Repeat Yourself)**
+   - Componentes reutilizáveis
+   - Hooks compartilhados
+   - Utilitários comuns
 
-// Cores
-type ButtonColor = 'primary' | 'secondary' | 'error' | 'success' | 'warning';
-```
+3. **KISS (Keep It Simple, Stupid)**
+   - Código legível
+   - Funções pequenas
+   - Complexidade minimizada
 
-### Cards
-```typescript
-// Variantes
-type CardVariant = 'elevation' | 'outlined';
+## Padrões de Estado
 
-// Props
-interface CardProps {
-  variant?: CardVariant;
-  elevation?: number;
-  className?: string;
-  children: React.ReactNode;
-}
-```
+### Frontend
+1. **Context + Reducer**
+   - Estado global tipado
+   - Ações previsíveis
+   - Updates imutáveis
 
-### Inputs
-```typescript
-// Variantes
-type InputVariant = 'outlined' | 'filled' | 'standard';
+2. **Local State**
+   - useState para estado simples
+   - useReducer para estado complexo
+   - Props para dados estáticos
 
-// Props
-interface InputProps {
-  label: string;
-  error?: string;
-  helperText?: string;
-  required?: boolean;
-  disabled?: boolean;
-}
-```
+3. **Cache Management**
+   - Cache de dados
+   - Invalidação controlada
+   - Atualização otimista
 
-## 📱 Breakpoints
+### Backend
+1. **Entity State**
+   - Status tracking
+   - Soft deletes
+   - Auditoria de mudanças
 
-```typescript
-const breakpoints = {
-  xs: '0px',
-  sm: '600px',
-  md: '960px',
-  lg: '1280px',
-  xl: '1920px'
-};
+2. **Transaction Management**
+   - ACID compliance
+   - Rollback automático
+   - Consistência garantida
 
-// Uso com Tailwind
-// sm: min-width: 600px
-// md: min-width: 960px
-// lg: min-width: 1280px
-// xl: min-width: 1920px
-```
+## Padrões de Segurança
 
-## 🎭 Animações
+### Autenticação
+1. **JWT Pattern**
+   - Tokens seguros
+   - Refresh automático
+   - Blacklisting de tokens
 
-```css
-/* Fade */
-.fade-enter {
-  opacity: 0;
-}
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 300ms ease-in;
-}
-.fade-exit {
-  opacity: 1;
-}
-.fade-exit-active {
-  opacity: 0;
-  transition: opacity 300ms ease-out;
-}
+2. **Role-Based Access**
+   - Hierarquia de roles
+   - Permissões granulares
+   - Middleware de autorização
 
-/* Slide */
-.slide-enter {
-  transform: translateX(100%);
-}
-.slide-enter-active {
-  transform: translateX(0);
-  transition: transform 300ms ease-in;
-}
-.slide-exit {
-  transform: translateX(0);
-}
-.slide-exit-active {
-  transform: translateX(-100%);
-  transition: transform 300ms ease-out;
-}
-```
+3. **OAuth2 Flow**
+   - Authorization Code
+   - Implicit Grant
+   - Refresh Token
 
-## 🌗 Modo Escuro
+### Dados
+1. **Input Validation**
+   - Validação no cliente
+   - Validação no servidor
+   - Sanitização de dados
 
-```typescript
-// Cores adaptativas
-const darkTheme = {
-  background: {
-    default: '#121212',
-    paper: '#1E1E1E'
-  },
-  text: {
-    primary: '#FFFFFF',
-    secondary: 'rgba(255, 255, 255, 0.7)'
-  }
-};
+2. **Error Handling**
+   - Erros amigáveis
+   - Logging detalhado
+   - Fallbacks seguros
 
-// Uso com Tailwind
-// dark:bg-gray-900
-// dark:text-white
-```
+## Padrões de API
+
+### REST
+1. **Resource-Based Routes**
+   - URLs semânticas
+   - Métodos HTTP apropriados
+   - Status codes corretos
+
+2. **Versioning**
+   - URL versioning
+   - Header versioning
+   - Backward compatibility
+
+3. **Response Format**
+   - JSON padronizado
+   - Erro consistente
+   - Paginação uniforme
+
+### GraphQL
+1. **Schema Design**
+   - Tipos bem definidos
+   - Resolvers eficientes
+   - N+1 prevention
+
+2. **Query Optimization**
+   - Field selection
+   - Batch loading
+   - Caching
+
+## Padrões de Teste
+
+### Frontend
+1. **Component Testing**
+   - Renderização
+   - Interação
+   - Snapshots
+
+2. **Integration Testing**
+   - Fluxos completos
+   - API mocking
+   - Estado global
+
+3. **E2E Testing**
+   - User flows
+   - Cross-browser
+   - Performance
+
+### Backend
+1. **Unit Testing**
+   - Services
+   - Repositories
+   - Helpers
+
+2. **Integration Testing**
+   - API endpoints
+   - Database operations
+   - External services
+
+3. **Load Testing**
+   - Performance
+   - Concorrência
+   - Limites do sistema
+
+## Padrões de Deploy
+
+### CI/CD
+1. **Build Pipeline**
+   - Linting
+   - Testing
+   - Building
+
+2. **Deployment Pipeline**
+   - Staging
+   - Production
+   - Rollback
+
+3. **Monitoring**
+   - Logs
+   - Métricas
+   - Alertas

@@ -1,45 +1,79 @@
-# System Patterns
+# Padrões do Sistema
 
-## Architecture Overview
-- Layered architecture with clear separation of concerns
-- Presentation Layer: Controllers and API endpoints
-- Business Logic Layer: Domain models and services
-- Data Access Layer: Entity Framework Core repositories
+## Padrões de Interface
 
-## Design Patterns
-1. Repository Pattern: Abstracting data access logic
-2. Dependency Injection: For loose coupling and testability
-3. Unit of Work: Managing database transactions
-4. Strategy Pattern: For different authentication providers
-5. Factory Pattern: For creating complex objects
-6. Image Upload Pattern: Using MinIO S3 for file storage with automatic URL generation
+### Formulários
+- Validação em tempo real
+- Feedback visual de erros
+- Campos obrigatórios marcados
+- Preview de imagens
+- Botões com estados de loading
 
-## Database Design
-- Code First approach with Entity Framework Core
-- PostgreSQL relational database
-- Entity relationships:
-  - One-to-Many: Usuario to Carrinho
-  - Many-to-Many: Carrinho to Item through ItemCarrinho
-- Indexes for frequently queried fields
-- Constraints for data integrity
+### Tabelas
+- Cabeçalhos claros
+- Preview de imagens em miniatura
+- Formatação de valores monetários
+- Ações contextuais
+- Feedback visual de interações
 
-## Security Patterns
-- JWT-based authentication
-- Role-based authorization
-- Input validation and sanitization
-- SSL encryption for data in transit
-- Secure password hashing
+### Feedback
+- Mensagens de sucesso/erro
+- Indicadores de loading
+- Confirmações de ações importantes
+- Tooltips informativos
+- Mensagens de erro detalhadas
 
-## API Design Principles
-- RESTful conventions
-- Versioning support
-- Consistent error handling
-- Pagination and filtering
-- Caching strategies
+## Padrões de Código
 
-## Testing Strategy
-- Unit tests for business logic
-- Integration tests for API endpoints
-- Mocking dependencies for isolated testing
-- Automated test suites
-- Continuous integration pipeline
+### TypeScript
+- Interfaces bem definidas
+- Tipos explícitos
+- Enums para valores constantes
+- Type guards quando necessário
+- Generics para reusabilidade
+
+### React
+- Componentes funcionais
+- Hooks para estado e efeitos
+- Context para estado global
+- Props tipadas
+- Error boundaries
+
+### Serviços
+- Métodos assíncronos
+- Tratamento de erros padronizado
+- Logging consistente
+- Retry patterns
+- Circuit breakers
+
+## Padrões de API
+
+### Endpoints
+- RESTful
+- Versionamento
+- Documentação Swagger
+- Rate limiting
+- Caching headers
+
+### Respostas
+- Status codes apropriados
+- Mensagens de erro padronizadas
+- Payload consistente
+- Paginação quando necessário
+- HATEOAS links
+
+## Padrões de Segurança
+
+### Autenticação
+- JWT tokens
+- Refresh tokens
+- Role-based access
+- Session management
+- CORS configurado
+
+### Dados
+- Validação de input
+- Sanitização de dados
+- Encryption em trânsito
+- Secure headers
+- Rate limiting

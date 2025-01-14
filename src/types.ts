@@ -3,8 +3,9 @@ export interface Item {
   nome: string | null;
   descricao: string | null;
   preco: number;
-  imagemUrl: string | null;
+  imagemUrl: string;
   categoria: string;
+  itensCarrinho?: ItemCarrinho[];
 }
 
 export interface Carrinho {
@@ -53,7 +54,18 @@ export interface Auth0User {
   nickname?: string;
   email?: string;
   picture?: string;
-  'https://api.cuattro.4lumen.com/roles'?: number[];
+  'https://api.cuattro.4lumen.com/roles'?: string[] | number[];
+  'https://api.cuattro.4lumen.com/role'?: string | number;
+  roles?: string[] | number[];
+  role?: string | number;
+  app_metadata?: {
+    role?: string | number;
+    roles?: string[] | number[];
+  };
+  user_metadata?: {
+    role?: string | number;
+    roles?: string[] | number[];
+  };
   [key: string]: any;
 }
 
@@ -67,6 +79,8 @@ export interface AppState {
   user: User | null;
   cart: Carrinho | null;
   items: Item[];
+  loading: boolean;
+  error: string | null;
 }
 
 export type AppAction =
@@ -74,4 +88,6 @@ export type AppAction =
   | { type: 'SET_CART'; payload: Carrinho | null }
   | { type: 'ADD_TO_CART'; payload: { item: Item; quantity: number } }
   | { type: 'REMOVE_FROM_CART'; payload: number }
-  | { type: 'SET_ITEMS'; payload: Item[] };
+  | { type: 'SET_ITEMS'; payload: Item[] }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null };

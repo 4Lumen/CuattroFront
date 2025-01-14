@@ -1,184 +1,221 @@
-# Contexto de Produtos
+# Contexto do Produto
 
-## 📦 Modelos
+## Visão Geral
 
-### Item
-```typescript
-interface Item {
-  id: number;
-  nome: string;
-  descricao: string;
-  preco: number;
-  imagemUrl: string;
-  categoria: string;
-}
-```
+### Propósito
+Sistema de gerenciamento para buffet que facilita:
+- Pedidos online
+- Gestão de cardápio
+- Controle de entregas
+- Relacionamento com clientes
 
-### ItemCarrinho
-```typescript
-interface ItemCarrinho {
-  id: number;
-  carrinhoId: number;
-  itemId: number;
-  quantidade: number;
-  item?: Item;
-}
-```
+### Público-Alvo
+1. **Clientes**
+   - Pessoas buscando serviços de buffet
+   - Empresas com eventos corporativos
+   - Organizadores de eventos
 
-### Carrinho
-```typescript
-interface Carrinho {
-  id: number;
-  usuarioId: number;
-  dataCriacao: string;
-  status: number;
-  itensCarrinho: ItemCarrinho[];
-}
-```
+2. **Funcionários**
+   - Atendentes
+   - Entregadores
+   - Cozinheiros
 
-## 🔄 Serviços
+3. **Administradores**
+   - Gerentes
+   - Proprietários
+   - Supervisores
 
-### itemService
-```typescript
-const itemService = {
-  getItems: async (): Promise<Item[]> => {
-    const response = await api.get('/Item');
-    return response.data;
-  },
+## Funcionalidades
 
-  getItemById: async (id: number): Promise<Item> => {
-    const response = await api.get(`/Item/${id}`);
-    return response.data;
-  },
+### Área do Cliente
+1. **Cardápio Digital**
+   - Categorias de produtos
+   - Fotos e descrições
+   - Preços atualizados
+   - Filtros e busca
 
-  createItem: async (item: Omit<Item, 'id'>): Promise<Item> => {
-    const response = await api.post('/Item', item);
-    return response.data;
-  },
+2. **Pedidos**
+   - Carrinho de compras
+   - Checkout simplificado
+   - Acompanhamento em tempo real
+   - Histórico de pedidos
 
-  updateItem: async (id: number, item: Partial<Item>): Promise<Item> => {
-    const response = await api.put(`/Item/${id}`, item);
-    return response.data;
-  },
+3. **Perfil**
+   - Dados pessoais
+   - Endereços salvos
+   - Preferências
+   - Avaliações
 
-  deleteItem: async (id: number): Promise<void> => {
-    await api.delete(`/Item/${id}`);
-  },
+### Área do Funcionário
+1. **Gestão de Pedidos**
+   - Lista de pedidos ativos
+   - Atualização de status
+   - Roteirização de entregas
+   - Comunicação com cliente
 
-  uploadImage: async (id: number, file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('image', file);
-    const response = await api.post(`/Item/${id}/imagem`, formData);
-    return response.data.imagemUrl;
-  }
-};
-```
+2. **Controle de Estoque**
+   - Disponibilidade de itens
+   - Alertas de baixo estoque
+   - Registro de movimentações
+   - Inventário
 
-### carrinhoService
-```typescript
-const carrinhoService = {
-  getCarrinho: async (userId: number): Promise<Carrinho | null> => {
-    try {
-      const response = await api.get(`/Carrinho/usuario/${userId}`);
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return null;
-      }
-      throw error;
-    }
-  },
+3. **Relatórios**
+   - Vendas diárias
+   - Tempo de entrega
+   - Satisfação do cliente
+   - Desempenho
 
-  createCarrinho: async (carrinho: Omit<Carrinho, 'id'>): Promise<Carrinho> => {
-    const response = await api.post('/Carrinho', carrinho);
-    return response.data;
-  },
+### Área Administrativa
+1. **Gestão de Cardápio**
+   - CRUD de produtos
+   - Gestão de categorias
+   - Upload de imagens
+   - Preços e promoções
 
-  updateCarrinho: async (id: number, carrinho: Partial<Carrinho>): Promise<Carrinho> => {
-    const response = await api.put(`/Carrinho/${id}`, carrinho);
-    return response.data;
-  },
+2. **Gestão de Usuários**
+   - Controle de acesso
+   - Permissões por role
+   - Histórico de ações
+   - Bloqueio/desbloqueio
 
-  deleteCarrinho: async (id: number): Promise<void> => {
-    await api.delete(`/Carrinho/${id}`);
-  }
-};
-```
+3. **Dashboard**
+   - Métricas em tempo real
+   - Gráficos e análises
+   - Relatórios gerenciais
+   - KPIs
 
-### itemCarrinhoService
-```typescript
-const itemCarrinhoService = {
-  addItemToCart: async (item: Omit<ItemCarrinho, 'id'>): Promise<ItemCarrinho> => {
-    const response = await api.post('/ItemCarrinho', item);
-    return response.data;
-  },
+## Experiência do Usuário
 
-  updateCartItem: async (id: number, quantidade: number): Promise<ItemCarrinho> => {
-    const response = await api.put(`/ItemCarrinho/${id}`, { quantidade });
-    return response.data;
-  },
+### Design
+1. **Interface**
+   - Clean e moderna
+   - Responsiva
+   - Intuitiva
+   - Acessível
 
-  removeItemFromCart: async (id: number): Promise<void> => {
-    await api.delete(`/ItemCarrinho/${id}`);
-  }
-};
-```
+2. **Navegação**
+   - Menu simplificado
+   - Breadcrumbs
+   - Busca rápida
+   - Filtros contextuais
 
-## 🎯 Hooks
+3. **Feedback**
+   - Mensagens claras
+   - Loading states
+   - Toasts informativos
+   - Confirmações
 
-### useItems
-```typescript
-const useItems = () => {
-  const { state, dispatch } = useAppContext();
+### Performance
+1. **Carregamento**
+   - Lazy loading
+   - Caching
+   - Compressão
+   - CDN
 
-  const fetchItems = async () => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      const items = await itemService.getItems();
-      dispatch({ type: 'SET_ITEMS', payload: items });
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao carregar itens' });
-      throw error;
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-  };
+2. **Interatividade**
+   - Resposta imediata
+   - Animações suaves
+   - Validação em tempo real
+   - Auto-save
 
-  const getItemsByCategory = (categoria: string) => {
-    return state.items.filter(item => item.categoria === categoria);
-  };
+3. **Offline**
+   - PWA ready
+   - Cache local
+   - Sync background
+   - Fallbacks
 
-  return {
-    items: state.items,
-    loading: state.loading,
-    error: state.error,
-    fetchItems,
-    getItemsByCategory
-  };
-};
-```
+## Segurança
 
-## 🛒 Fluxo de Compra
+### Autenticação
+1. **Login**
+   - Social login
+   - 2FA opcional
+   - Remember me
+   - Recuperação de senha
 
-1. Listagem de Produtos
-   - Carrega itens do backend
-   - Filtra por categoria
-   - Exibe cards com imagem e preço
+2. **Sessão**
+   - Token JWT
+   - Refresh token
+   - Timeout
+   - Logout automático
 
-2. Adição ao Carrinho
-   - Verifica autenticação
-   - Adiciona item ao carrinho
-   - Atualiza quantidade se já existe
-   - Persiste no backend
+### Autorização
+1. **Roles**
+   - Cliente (0)
+   - Funcionário (1)
+   - Admin (2)
 
-3. Gerenciamento do Carrinho
-   - Lista itens do carrinho
-   - Permite alterar quantidade
-   - Remove itens
-   - Calcula total
+2. **Permissões**
+   - Granulares
+   - Hierárquicas
+   - Auditáveis
+   - Revogáveis
 
-4. Finalização da Compra
-   - Confirma itens
-   - Seleciona forma de pagamento
-   - Processa pagamento
-   - Gera pedido
+## Integrações
+
+### Externas
+1. **Pagamento**
+   - Gateway
+   - Split payment
+   - Reembolso
+   - Recorrência
+
+2. **Logística**
+   - Rastreamento
+   - Roteirização
+   - Geocoding
+   - ETAs
+
+### Internas
+1. **Notificações**
+   - Email
+   - Push
+   - SMS
+   - In-app
+
+2. **Storage**
+   - Imagens
+   - Documentos
+   - Backups
+   - Logs
+
+## Roadmap
+
+### Curto Prazo
+1. **MVP**
+   - CRUD básico
+   - Auth0 integration
+   - Upload de imagens
+   - Pedidos simples
+
+2. **Melhorias**
+   - UX refinements
+   - Performance
+   - Testes
+   - Documentação
+
+### Médio Prazo
+1. **Expansão**
+   - Mais features
+   - Integrações
+   - Analytics
+   - Mobile app
+
+2. **Otimização**
+   - Escalabilidade
+   - Monitoramento
+   - DevOps
+   - SEO
+
+### Longo Prazo
+1. **Inovação**
+   - IA/ML
+   - Chatbot
+   - Personalização
+   - Marketplace
+
+2. **Crescimento**
+   - Multi-tenant
+   - White-label
+   - API pública
+   - Internacionalização
