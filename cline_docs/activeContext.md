@@ -1,194 +1,147 @@
 # Contexto Ativo
 
-## 🔄 Estado Global
+## Desenvolvimento Atual
 
-### AppState
-```typescript
-interface AppState {
-  user: User | null;
-  cart: Carrinho | null;
-  items: Item[];
-  loading: boolean;
-  error: string | null;
-}
-```
+### Frontend
+1. **Autenticação**
+   - ✅ Integração com Auth0
+   - ✅ Login social
+   - ✅ Gerenciamento de roles
+   - ✅ Proteção de rotas
 
-### AppAction
-```typescript
-type AppAction =
-  | { type: 'SET_USER'; payload: User | null }
-  | { type: 'SET_CART'; payload: Carrinho | null }
-  | { type: 'SET_ITEMS'; payload: Item[] }
-  | { type: 'ADD_TO_CART'; payload: ItemCarrinho }
-  | { type: 'REMOVE_FROM_CART'; payload: number }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null };
-```
+2. **Gerenciamento de Itens**
+   - ✅ CRUD completo
+   - ✅ Upload de imagens
+   - ✅ Preview de imagens
+   - ✅ Validação de formulários
 
-## 🎯 Hooks Personalizados
+3. **Interface**
+   - ✅ Layout responsivo
+   - ✅ Tema Material-UI
+   - ✅ Feedback visual
+   - ✅ Loading states
 
-### useAppContext
-```typescript
-const useAppContext = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useAppContext deve ser usado dentro de um AppProvider');
-  }
-  return context;
-};
-```
+### Backend
+1. **API**
+   - ✅ Endpoints RESTful
+   - ✅ Swagger docs
+   - ✅ Validação de dados
+   - ✅ Error handling
 
-### useCart
-```typescript
-const useCart = () => {
-  const { state, dispatch } = useAppContext();
-  
-  const addToCart = async (itemId: number, quantity: number) => {
-    try {
-      if (!state.user) {
-        throw new Error('Usuário não autenticado');
-      }
+2. **Storage**
+   - ✅ Minio integration
+   - ✅ Image optimization
+   - ✅ Backup system
+   - ✅ CDN delivery
 
-      let currentCart = state.cart;
-      if (!currentCart) {
-        currentCart = await carrinhoService.createCarrinho({
-          usuarioId: state.user.id,
-          dataCriacao: new Date().toISOString(),
-          status: 0,
-          itensCarrinho: []
-        });
-        dispatch({ type: 'SET_CART', payload: currentCart });
-      }
+## Em Progresso
 
-      const item = await itemCarrinhoService.addItemToCart({
-        carrinhoId: currentCart.id,
-        itemId,
-        quantidade: quantity
-      });
+### Frontend
+1. **Carrinho**
+   - 🔄 Adição/remoção de itens
+   - 🔄 Persistência local
+   - 🔄 Sincronização
+   - 🔄 Checkout
 
-      dispatch({ type: 'ADD_TO_CART', payload: item });
-    } catch (error) {
-      console.error('Erro ao adicionar item ao carrinho:', error);
-      throw error;
-    }
-  };
+2. **Pedidos**
+   - 🔄 Criação
+   - 🔄 Acompanhamento
+   - 🔄 Histórico
+   - 🔄 Status updates
 
-  const removeFromCart = async (itemId: number) => {
-    try {
-      if (!state.cart) return;
-      
-      await itemCarrinhoService.removeItemFromCart(itemId);
-      dispatch({ type: 'REMOVE_FROM_CART', payload: itemId });
-    } catch (error) {
-      console.error('Erro ao remover item do carrinho:', error);
-      throw error;
-    }
-  };
+### Backend
+1. **Pedidos**
+   - 🔄 Workflow de status
+   - 🔄 Notificações
+   - 🔄 Relatórios
+   - 🔄 Analytics
 
-  const getItemQuantity = (itemId: number) => {
-    return state.cart?.itensCarrinho?.find(item => item.itemId === itemId)?.quantidade || 0;
-  };
+2. **Segurança**
+   - 🔄 Rate limiting
+   - 🔄 CORS
+   - 🔄 Input sanitization
+   - 🔄 Audit logs
 
-  const getCartTotal = () => {
-    return state.cart?.itensCarrinho?.reduce((total, item) => {
-      const itemPrice = state.items.find(i => i.id === item.itemId)?.preco || 0;
-      return total + (itemPrice * item.quantidade);
-    }, 0) || 0;
-  };
+## Próximos Passos
 
-  return {
-    cart: state.cart,
-    addToCart,
-    removeFromCart,
-    getItemQuantity,
-    getCartTotal
-  };
-};
-```
+### Curto Prazo
+1. **Frontend**
+   - Finalizar carrinho
+   - Implementar checkout
+   - Adicionar filtros
+   - Melhorar UX
 
-### useAuth
-```typescript
-const useAuth = () => {
-  const { state, dispatch } = useAppContext();
-  const navigate = useNavigate();
+2. **Backend**
+   - Otimizar queries
+   - Implementar cache
+   - Melhorar logs
+   - Adicionar métricas
 
-  const login = async () => {
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      const user = await authService.login();
-      dispatch({ type: 'SET_USER', payload: user });
-      navigate('/');
-    } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao fazer login' });
-      throw error;
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-  };
+### Médio Prazo
+1. **Features**
+   - Sistema de notificações
+   - Chat com cliente
+   - Avaliações
+   - Cupons
 
-  const logout = async () => {
-    try {
-      await authService.logout();
-      dispatch({ type: 'SET_USER', payload: null });
-      dispatch({ type: 'SET_CART', payload: null });
-      navigate('/login');
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-      throw error;
-    }
-  };
+2. **Infraestrutura**
+   - CI/CD
+   - Monitoring
+   - Backup automation
+   - Performance optimization
 
-  return {
-    user: state.user,
-    loading: state.loading,
-    error: state.error,
-    login,
-    logout
-  };
-};
-```
+## Problemas Conhecidos
 
-## 🔒 Proteção de Rotas
+### Frontend
+1. **Performance**
+   - Otimização de imagens
+   - Lazy loading
+   - Bundle size
+   - Cache strategy
 
-### PrivateRoute
-```typescript
-interface PrivateRouteProps {
-  roles?: string[];
-  children: React.ReactNode;
-}
+2. **UX**
+   - Feedback de erros
+   - Loading states
+   - Form validation
+   - Mobile experience
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ roles, children }) => {
-  const { user } = useAuth();
-  const location = useLocation();
+### Backend
+1. **Escalabilidade**
+   - Connection pooling
+   - Query optimization
+   - Caching
+   - Load balancing
 
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+2. **Manutenção**
+   - Logging
+   - Monitoring
+   - Error tracking
+   - Documentation
 
-  if (roles && !roles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
+## Melhorias Planejadas
 
-  return <>{children}</>;
-};
-```
+### Técnicas
+1. **Frontend**
+   - Code splitting
+   - PWA features
+   - Test coverage
+   - Accessibility
 
-## 🌐 Fluxo de Autenticação
+2. **Backend**
+   - Microservices
+   - Event sourcing
+   - GraphQL API
+   - Real-time updates
 
-1. Usuário acessa rota protegida
-2. PrivateRoute verifica autenticação
-3. Se não autenticado, redireciona para login
-4. Auth0 processa autenticação
-5. Callback redireciona de volta
-6. Token é armazenado
-7. Usuário é redirecionado para rota original
+### Negócio
+1. **Features**
+   - Analytics dashboard
+   - CRM integration
+   - Marketing tools
+   - Loyalty system
 
-## 🛒 Fluxo do Carrinho
-
-1. Usuário adiciona item
-2. Verifica autenticação
-3. Cria carrinho se não existir
-4. Adiciona item ao carrinho
-5. Atualiza estado global
-6. Persiste no backend
-7. Atualiza UI
+2. **Expansão**
+   - Multi-language
+   - White-label
+   - API marketplace
+   - Mobile app

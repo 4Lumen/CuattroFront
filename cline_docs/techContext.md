@@ -1,232 +1,172 @@
 # Contexto Técnico
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 ### Frontend
-- React 18 com TypeScript
-- Material UI v5
-- Tailwind CSS
-- React Router v6
-- Auth0 para autenticação
-- Context API para estado global
-- Axios para requisições HTTP
+- **Framework**: React 18 com TypeScript 4
+- **UI Library**: Material-UI v5
+- **Estado Global**: Context API
+- **Roteamento**: React Router v6
+- **Autenticação**: Auth0
+- **HTTP Client**: Axios
 
 ### Backend
-- .NET 7 Web API
-- Entity Framework Core
-- SQL Server
-- Swagger/OpenAPI
-- JWT Authentication
-- Azure Blob Storage
+- **Framework**: .NET Core 7
+- **ORM**: Entity Framework Core
+- **Database**: SQL Server
+- **Storage**: Minio para imagens
+- **API Docs**: Swagger/OpenAPI
 
-## 🔧 Configuração
+## Estrutura do Projeto
 
-### Ambiente de Desenvolvimento
-```bash
-# Instalação
-npm install
-
-# Desenvolvimento
-npm run dev
-
-# Build
-npm run build
-
-# Testes
-npm run test
-```
-
-### Variáveis de Ambiente
-```env
-# API
-REACT_APP_API_URL=https://api.cuattro.4lumen.com
-
-# Auth0
-REACT_APP_AUTH0_DOMAIN=cuattro.us.auth0.com
-REACT_APP_AUTH0_CLIENT_ID=your_client_id
-REACT_APP_AUTH0_AUDIENCE=https://buffet-app.4lumen.com
-
-# Roles
-REACT_APP_ROLE_ADMIN=admin
-REACT_APP_ROLE_EMPLOYEE=employee
-REACT_APP_ROLE_CUSTOMER=customer
-```
-
-## 📦 Estrutura do Projeto
-
+### Frontend
 ```
 src/
-├── components/        # Componentes reutilizáveis
-├── context/          # Contextos e providers
-├── hooks/            # Hooks customizados
-├── pages/            # Componentes de página
-├── services/         # Serviços de API
-├── styles/           # Estilos globais
-├── types/            # Definições de tipos
-└── utils/            # Funções utilitárias
+├── components/     # Componentes reutilizáveis
+├── context/       # Contextos globais
+├── hooks/         # Hooks personalizados
+├── pages/         # Páginas da aplicação
+├── services/      # Serviços e APIs
+├── types/         # Tipos e interfaces
+└── utils/         # Utilitários
 ```
 
-## 🔒 Segurança
+### Backend
+```
+src/
+├── Controllers/   # Controllers da API
+├── Models/        # Modelos de dados
+├── Services/      # Lógica de negócio
+├── Repositories/  # Acesso a dados
+└── Middleware/    # Middlewares
+```
+
+## Fluxos Principais
+
+### Autenticação
+1. Login via Auth0
+2. Obtenção de tokens
+3. Verificação de roles
+4. Redirecionamento baseado em permissões
+
+### Gerenciamento de Itens
+1. CRUD completo via API
+2. Upload de imagens para Minio
+3. Cache de dados no frontend
+4. Validação em tempo real
+
+### Carrinho de Compras
+1. Persistência local
+2. Sincronização com backend
+3. Cálculos em tempo real
+4. Checkout seguro
+
+## Integrações
 
 ### Auth0
-1. Configuração
-   ```typescript
-   const auth0Config = {
-     domain: process.env.REACT_APP_AUTH0_DOMAIN,
-     clientId: process.env.REACT_APP_AUTH0_CLIENT_ID,
-     audience: process.env.REACT_APP_AUTH0_AUDIENCE,
-     redirectUri: window.location.origin,
-     scope: 'openid profile email'
-   };
-   ```
+- Login social
+- Gerenciamento de roles
+- Tokens JWT
+- Refresh token automático
 
-2. Proteção de Rotas
-   ```typescript
-   <Route
-     path="/admin"
-     element={
-       <PrivateRoute roles={['admin']}>
-         <AdminPage />
-       </PrivateRoute>
-     }
-   />
-   ```
+### Minio
+- Armazenamento de imagens
+- CDN para delivery
+- Backup automático
+- Otimização de imagens
 
 ### API
-1. Interceptor de Token
-   ```typescript
-   api.interceptors.request.use(async (config) => {
-     const token = await auth0.getTokenSilently();
-     config.headers.Authorization = `Bearer ${token}`;
-     return config;
-   });
-   ```
+- RESTful
+- Versionada
+- Rate limiting
+- CORS configurado
 
-2. Tratamento de Erros
-   ```typescript
-   api.interceptors.response.use(
-     (response) => response,
-     async (error) => {
-       if (error.response?.status === 401) {
-         await auth0.logout();
-       }
-       return Promise.reject(error);
-     }
-   );
-   ```
+## Segurança
 
-## 🎯 Performance
+### Autenticação
+- JWT tokens
+- Refresh tokens
+- HTTPS obrigatório
+- Proteção contra CSRF
 
-### Otimizações
-1. Code Splitting
-   ```typescript
-   const AdminPage = lazy(() => import('./pages/AdminPage'));
-   ```
+### Autorização
+- Roles baseados em claims
+- Middleware de autorização
+- Validação de tokens
+- Auditoria de acessos
 
-2. Memoização
-   ```typescript
-   const MemoizedComponent = memo(Component);
-   ```
+### Dados
+- Sanitização de inputs
+- Validação de dados
+- Criptografia em trânsito
+- Backup regular
 
-3. Virtualização
-   ```typescript
-   <VirtualList
-     height={400}
-     itemCount={items.length}
-     itemSize={50}
-     width={300}
-   >
-     {Row}
-   </VirtualList>
-   ```
+## Performance
 
-### Cache
-1. React Query
-   ```typescript
-   const { data, isLoading } = useQuery('items', fetchItems, {
-     staleTime: 5 * 60 * 1000,
-     cacheTime: 30 * 60 * 1000
-   });
-   ```
+### Frontend
+- Code splitting
+- Lazy loading
+- Caching de dados
+- Otimização de imagens
 
-2. Service Worker
-   ```typescript
-   if ('serviceWorker' in navigator) {
-     window.addEventListener('load', () => {
-       navigator.serviceWorker.register('/sw.js');
-     });
-   }
-   ```
+### Backend
+- Caching de queries
+- Paginação
+- Compressão de resposta
+- Pooling de conexões
 
-## 📊 Monitoramento
+## Monitoramento
 
-### Logging
-```typescript
-const logger = {
-  info: (message: string, data?: any) => {
-    console.log(`[INFO] ${message}`, data);
-  },
-  error: (message: string, error: any) => {
-    console.error(`[ERROR] ${message}`, error);
-  },
-  warn: (message: string, data?: any) => {
-    console.warn(`[WARN] ${message}`, data);
-  }
-};
-```
+### Logs
+- Erros do cliente
+- Erros do servidor
+- Acessos à API
+- Performance metrics
 
 ### Métricas
-1. Performance
-   ```typescript
-   const reportWebVitals = (metric: any) => {
-     console.log(metric);
-   };
-   ```
+- Tempo de resposta
+- Taxa de erro
+- Uso de recursos
+- Acessos por rota
 
-2. Erros
-   ```typescript
-   window.onerror = (message, source, lineno, colno, error) => {
-     logger.error('Global error:', {
-       message,
-       source,
-       lineno,
-       colno,
-       error
-     });
-   };
-   ```
+## Ambiente de Desenvolvimento
 
-## 🚀 Deploy
+### Requisitos
+- Node.js 16+
+- .NET SDK 7
+- SQL Server
+- Docker
 
-### Pipeline
-1. Build
-   ```yaml
-   build:
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v2
-       - uses: actions/setup-node@v2
-       - run: npm ci
-       - run: npm run build
-   ```
+### Setup
+1. Clone do repositório
+2. Instalação de dependências
+3. Configuração de variáveis de ambiente
+4. Inicialização dos serviços
 
-2. Testes
-   ```yaml
-   test:
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v2
-       - uses: actions/setup-node@v2
-       - run: npm ci
-       - run: npm run test
-   ```
+## Deployment
 
-3. Deploy
-   ```yaml
-   deploy:
-     needs: [build, test]
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v2
-       - uses: azure/webapps-deploy@v2
-   ```
+### Frontend
+- Build otimizado
+- Assets versionados
+- CDN para estáticos
+- Cache headers
+
+### Backend
+- Container Docker
+- Load balancer
+- Auto scaling
+- Health checks
+
+## Manutenção
+
+### Backups
+- Database: diário
+- Imagens: semanal
+- Logs: mensal
+- Configurações: por mudança
+
+### Updates
+- Dependências: mensal
+- Sistema: trimestral
+- Segurança: imediato
+- Framework: por LTS
