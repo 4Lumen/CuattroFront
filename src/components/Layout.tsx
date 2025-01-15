@@ -29,8 +29,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             disableGutters 
             sx={{ 
               flexDirection: { xs: 'column', md: 'row' },
-              py: { xs: 1, md: 2 },
-              gap: { xs: 1, md: 2 }
+              py: { xs: 2, md: 2 },
+              gap: { xs: 2, md: 2 },
+              minHeight: { xs: 'auto' }
             }}
           >
             <Box 
@@ -38,10 +39,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               src="/cuattrolivedigital_logo.jpg"
               alt="Logo"
               sx={{
-                height: { xs: '40px', md: '50px' }
+                height: { xs: '40px', md: '50px' },
+                width: 'auto',
+                objectFit: 'contain'
               }}
             />
-            <Navbar />
+            <Box sx={{ width: '100%' }}>
+              <Navbar />
+            </Box>
           </Toolbar>
         </Container>
       </AppBar>

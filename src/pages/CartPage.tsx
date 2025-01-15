@@ -4,7 +4,7 @@ import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useCart } from '../hooks/useCart';
 
 const CartPage: React.FC = () => {
-  const { items, total, addToCart, removeFromCart } = useCart();
+  const { items, total, addToCart, decrementFromCart } = useCart();
 
   if (items.length === 0) {
     return (
@@ -58,9 +58,10 @@ const CartPage: React.FC = () => {
                 <TableCell align="center">
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <IconButton 
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => decrementFromCart(item.id)}
                       size="small"
                       color="primary"
+                      disabled={quantity === 0}
                     >
                       <RemoveIcon />
                     </IconButton>
@@ -68,7 +69,7 @@ const CartPage: React.FC = () => {
                       {quantity}
                     </Typography>
                     <IconButton 
-                      onClick={() => addToCart(item)}
+                      onClick={() => addToCart(item, 1)}
                       size="small"
                       color="primary"
                     >

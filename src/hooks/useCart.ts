@@ -17,6 +17,13 @@ export const useCart = () => {
     });
   };
 
+  const decrementFromCart = (itemId: number) => {
+    dispatch({
+      type: 'DECREMENT_ITEM',
+      payload: itemId
+    });
+  };
+
   const removeFromCart = (itemId: number) => {
     dispatch({
       type: 'REMOVE_ITEM',
@@ -32,6 +39,7 @@ export const useCart = () => {
     items: state.items,
     total: state.total,
     addToCart,
+    decrementFromCart,
     removeFromCart,
     clearCart
   };
