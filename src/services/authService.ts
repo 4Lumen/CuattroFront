@@ -15,7 +15,7 @@ const auth0Config = {
   clientId: AUTH0_CLIENT_ID,
   audience: AUTH0_AUDIENCE,
   redirectUri: window.location.origin,
-  scope: 'openid profile email offline_access'
+  scope: 'openid profile email offline_access roles permissions'
 };
 
 console.log('Auth0 Config:', auth0Config);
@@ -206,6 +206,44 @@ const AuthService = {
         return null;
       }
 
+      // Obtém e loga o token decodificado
+      try {
+        const token = await auth0.getTokenSilently({
+          authorizationParams: {
+            audience: auth0Config.audience,
+            scope: auth0Config.scope
+          },
+          detailedResponse: true
+        });
+        console.log('Token obtido:', {
+          access_token: token.access_token.substring(0, 20) + '...',
+          scope: token.scope,
+          expires_in: token.expires_in
+        });
+
+        // Decodifica o token
+        const parts = token.access_token.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1]));
+          console.log('Token payload decodificado:', payload);
+          
+          // Verifica se há claims de roles no token
+          const rolesClaims = {
+            [`${auth0Config.audience}/roles`]: payload[`${auth0Config.audience}/roles`],
+            [`${auth0Config.audience}/role`]: payload[`${auth0Config.audience}/role`],
+            'https://api.cuattro.4lumen.com/roles': payload['https://api.cuattro.4lumen.com/roles'],
+            'https://api.cuattro.4lumen.com/role': payload['https://api.cuattro.4lumen.com/role'],
+            roles: payload.roles,
+            role: payload.role
+          };
+          console.log('Claims de roles encontradas no token:', rolesClaims);
+        } else {
+          console.log('Token não está no formato esperado JWT (header.payload.signature)');
+        }
+      } catch (error) {
+        console.error('Erro ao decodificar token:', error);
+      }
+
       // Se chegou aqui, está autenticado. Obtém os dados do usuário
       const auth0User = await auth0.getUser<Auth0User>();
       console.log('Dados do usuário Auth0:', auth0User);
@@ -235,19 +273,25 @@ const AuthService = {
 
   getRoleFromAuth0User(auth0User: Auth0User): Role {
     console.log('Auth0 User completo:', auth0User);
+    console.log('Auth0 User metadata:', {
+      app_metadata: auth0User.app_metadata,
+      user_metadata: auth0User.user_metadata
+    });
     
-    // Verifica se o usuário tem o email do admin
-    if (auth0User.email === 'gmunaro@gmail.com') {
-      console.log('Usuário identificado como Admin pelo email');
-      return Role.Admin;
+    const namespace = 'https://api.cuattro.4lumen.com';
+    
+    // Primeiro tenta obter o role numérico diretamente
+    const numericRole = auth0User[`${namespace}/role`];
+    if (typeof numericRole === 'number' && numericRole >= 0 && numericRole <= 2) {
+      console.log('Role numérico encontrado:', numericRole);
+      return numericRole as Role;
     }
 
     // Verifica em diferentes locais possíveis do token
     const roleLocations = [
-      auth0User[`${auth0Config.audience}/roles`],
-      auth0User['https://api.cuattro.4lumen.com/roles'],
+      auth0User[`${namespace}/roles`],
+      auth0User[`${namespace}/role`],
       auth0User['roles'],
-      auth0User['https://api.cuattro.4lumen.com/role'],
       auth0User['role'],
       // Verifica também em app_metadata e user_metadata
       auth0User['app_metadata']?.role,
@@ -256,7 +300,9 @@ const AuthService = {
       auth0User['user_metadata']?.roles
     ];
 
+    console.log('Audience configurada:', auth0Config.audience);
     console.log('Possíveis localizações de roles:', roleLocations);
+    console.log('Campos disponíveis no auth0User:', Object.keys(auth0User));
 
     // Tenta encontrar um role válido em qualquer uma das localizações
     for (const roles of roleLocations) {
@@ -270,7 +316,9 @@ const AuthService = {
             'funcionario': Role.Funcionario,
             'Funcionario': Role.Funcionario,
             'cliente': Role.Cliente,
-            'Cliente': Role.Cliente
+            'Cliente': Role.Cliente,
+            'customer': Role.Cliente,
+            'Customer': Role.Cliente
           };
           
           const roleName = roles[0];
@@ -281,10 +329,10 @@ const AuthService = {
         }
         
         // Se for um número
-        const roleNumber = parseInt(roles[0]);
+        const roleNumber = parseInt(roles[0].toString());
         if (!isNaN(roleNumber) && roleNumber >= 0 && roleNumber <= 2) {
           console.log('Role mapeado pelo número:', roleNumber);
-          return roleNumber;
+          return roleNumber as Role;
         }
       } else if (typeof roles === 'string') {
         // Se for uma string única
@@ -294,13 +342,22 @@ const AuthService = {
           'funcionario': Role.Funcionario,
           'Funcionario': Role.Funcionario,
           'cliente': Role.Cliente,
-          'Cliente': Role.Cliente
+          'Cliente': Role.Cliente,
+          'customer': Role.Cliente,
+          'Customer': Role.Cliente
         };
         
         const roleName = roles;
         if (roleMap[roleName] !== undefined) {
           console.log('Role mapeado pela string única:', roleName, roleMap[roleName]);
           return roleMap[roleName];
+        }
+
+        // Se for um número em string
+        const roleNumber = parseInt(roles);
+        if (!isNaN(roleNumber) && roleNumber >= 0 && roleNumber <= 2) {
+          console.log('Role mapeado pelo número em string:', roleNumber);
+          return roleNumber as Role;
         }
       }
     }

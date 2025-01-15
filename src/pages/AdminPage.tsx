@@ -5,10 +5,6 @@ import {
   Paper,
   TextField,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Box,
   Alert,
   InputAdornment,
@@ -19,30 +15,28 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
-import { useAppContext } from '../context/AppContext';
-import itemService from '../services/itemService';
+import itemService, { Item } from '../services/itemService';
+import categoriaService, { Categoria } from '../services/categoriaService';
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import EditIcon from '@mui/icons-material/Edit';
-import type { Item } from '../types';
-
-const categorias = [
-  'Salgados',
-  'Doces',
-  'Bebidas',
-  'Decoração',
-  'Pratos Quentes'
-];
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const AdminPage: React.FC = () => {
-  const { dispatch } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState<string>('');
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
 
   useEffect(() => {
     loadItems();
@@ -50,22 +44,158 @@ const AdminPage: React.FC = () => {
 
   const loadItems = async () => {
     try {
+      // Primeiro carrega todas as categorias
+      const categorias = await categoriaService.getCategorias();
+      console.log('Categorias carregadas:', categorias.map(c => ({
+        id: c.id,
+        tipo: typeof c.id,
+        nome: c.nome
+      })));
+
+      // Depois carrega os itens
       const loadedItems = await itemService.getItems();
-      setItems(loadedItems);
+      console.log('Itens carregados:', loadedItems.map(item => ({
+        nome: item.nome,
+        categoriaId: item.categoriaId,
+        tipoCategoriaId: typeof item.categoriaId
+      })));
+      
+      // Associa as categorias corretas aos itens
+      const itemsWithCategories = loadedItems.map(item => {
+        console.log('\n=== Processando item:', item.nome, '===');
+        
+        // Primeiro tenta pelo categoriaId
+        if (item.categoriaId !== undefined && item.categoriaId !== null) {
+          console.log('Tentando encontrar categoria com ID:', item.categoriaId);
+          const itemCategoriaId = Number(item.categoriaId);
+          const categoria = categorias.find(c => {
+            const categoriaId = Number(c.id);
+            const match = categoriaId === itemCategoriaId;
+            console.log(`Comparando com categoria "${c.nome}":`, {
+              categoriaId,
+              itemCategoriaId,
+              match
+            });
+            return match;
+          });
+
+          if (categoria) {
+            console.log('✅ Categoria encontrada:', categoria.nome);
+            return { ...item, categoria };
+          } else {
+            console.log('❌ Nenhuma categoria encontrada com ID:', item.categoriaId);
+          }
+        }
+        
+        // Se não achou por ID, tenta pelo objeto categoria
+        if (item.categoria && typeof item.categoria === 'object' && 'id' in item.categoria) {
+          const categoriaId = Number(item.categoria.id);
+          console.log('Tentando encontrar categoria pelo objeto.id:', categoriaId);
+          const categoria = categorias.find(c => Number(c.id) === categoriaId);
+          if (categoria) {
+            console.log('✅ Categoria encontrada pelo objeto:', categoria.nome);
+            return { ...item, categoria };
+          }
+        }
+        
+        // Se não achou por ID, tenta pelo nome
+        if (item.categoria && typeof item.categoria === 'string') {
+          const categoriaNome = item.categoria;
+          console.log('Tentando encontrar categoria pelo nome:', categoriaNome);
+          const categoria = categorias.find(c => 
+            c.nome && c.nome.toLowerCase() === categoriaNome.toLowerCase()
+          );
+          if (categoria) {
+            console.log('✅ Categoria encontrada pelo nome:', categoria.nome);
+            return { ...item, categoria };
+          }
+        }
+        
+        // Se não encontrou categoria válida
+        console.log('❌ Nenhuma categoria válida encontrada, usando padrão');
+        const categoriaDefault = { 
+          id: 0, 
+          nome: 'Sem Categoria', 
+          descricao: 'Sem Categoria', 
+          ordem: 0, 
+          ativa: true 
+        };
+        return { ...item, categoria: categoriaDefault };
+      });
+
+      console.log('\nItens processados:', itemsWithCategories.map(item => ({
+        nome: item.nome,
+        categoriaId: item.categoriaId,
+        categoriaNome: item.categoria?.nome
+      })));
+      
+      setItems(itemsWithCategories);
     } catch (error) {
       console.error('Erro ao carregar itens:', error);
+      setError('Erro ao carregar itens. Por favor, tente novamente.');
     }
   };
 
+  const getCategoriaDisplay = (categoria: string | Categoria | undefined): string => {
+    if (!categoria) {
+      console.log('Categoria undefined, retornando "Sem Categoria"');
+      return 'Sem Categoria';
+    }
+    
+    if (typeof categoria === 'string') {
+      console.log('Categoria é string:', categoria);
+      return categoria;
+    }
+    
+    if ('nome' in categoria) {
+      console.log('Categoria é objeto com nome:', categoria.nome);
+      return categoria.nome;
+    }
+    
+    console.log('Categoria inválida:', categoria);
+    return 'Sem Categoria';
+  };
+
   const handleEdit = (item: Item) => {
-    setEditingItem(item);
+    if (!item) {
+      console.error('Tentativa de editar um item undefined');
+      setError('Erro ao editar item: item não encontrado');
+      return;
+    }
+
+    console.log('Item para edição:', item);
+    console.log('Categoria do item:', item.categoria);
+
+    // Garante que o item tenha uma categoria válida
+    let categoriaNome: string;
+    if (item.categoria && typeof item.categoria === 'object' && 'nome' in item.categoria) {
+      console.log('Usando nome da categoria do objeto:', item.categoria.nome);
+      categoriaNome = item.categoria.nome;
+    } else if (item.categoria && typeof item.categoria === 'string') {
+      console.log('Usando categoria string:', item.categoria);
+      categoriaNome = item.categoria;
+    } else {
+      console.log('Usando categoria padrão');
+      categoriaNome = 'Sem Categoria';
+    }
+
+    console.log('Nome da categoria extraído:', categoriaNome);
+
+    // Mantém o objeto categoria completo no editingItem
+    setEditingItem({
+      ...item,
+      categoria: item.categoria // Mantém o objeto categoria original
+    });
+
+    // Define o nome da categoria no formData
     setFormData({
       nome: item.nome || '',
       descricao: item.descricao || '',
-      preco: item.preco.toString(),
-      categoria: item.categoria,
+      preco: item.preco?.toString() || '',
+      categoria: categoriaNome,
       imagem: null
     });
+
     setSelectedFileName('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -105,13 +235,6 @@ const AdminPage: React.FC = () => {
     }));
   };
 
-  const handleCategoriaChange = (e: any) => {
-    setFormData(prev => ({
-      ...prev,
-      categoria: e.target.value
-    }));
-  };
-
   const handleImagemChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -130,93 +253,129 @@ const AdminPage: React.FC = () => {
     setSuccess(false);
 
     try {
-      // Validações básicas
-      if (!formData.nome.trim()) {
-        throw new Error('Por favor, insira um nome para o item');
-      }
-      if (!formData.categoria) {
-        throw new Error('Por favor, selecione uma categoria');
-      }
-      if (!formData.preco) {
-        throw new Error('Por favor, insira um preço');
-      }
+      // Primeiro cria/obtém a categoria
+      const categoria = await itemService.getOrCreateCategoria(formData.categoria);
+      console.log('Categoria obtida/criada:', categoria);
 
-      const preco = parseFloat(formData.preco);
-      if (isNaN(preco) || preco <= 0) {
-        throw new Error('Por favor, insira um preço válido maior que zero');
-      }
-
-      // Formata os dados para envio
       const itemData = {
-        nome: formData.nome.trim() || '',
-        descricao: formData.descricao.trim() || '',
-        preco: Number(preco.toFixed(2)),
-        categoria: formData.categoria,
+        nome: formData.nome,
+        descricao: formData.descricao,
+        preco: Number(formData.preco),
+        categoria: categoria, // Usa o objeto categoria completo
         imagemUrl: editingItem?.imagemUrl || ''
       };
 
-      let updatedItem;
+      let createdOrUpdatedItem: Item;
 
-      if (editingItem) {
-        // Atualizar item existente
-        updatedItem = await itemService.updateItem({
-          ...editingItem,
-          ...itemData
-        });
-        console.log('Item atualizado:', updatedItem);
-      } else {
-        // Criar novo item
-        updatedItem = await itemService.createItem(itemData);
-        console.log('Item criado:', updatedItem);
-      }
-
-      // Se houver imagem, fazer o upload
+      // Se tem imagem nova, faz o upload primeiro
       if (formData.imagem) {
-        console.log('Iniciando upload da imagem...', {
-          itemId: updatedItem.id,
-          fileName: formData.imagem.name,
-          fileSize: formData.imagem.size,
-          fileType: formData.imagem.type
-        });
+        // Se está editando, usa o ID existente, senão cria o item primeiro
+        if (editingItem) {
+          console.log('Iniciando upload da imagem para item existente...', {
+            itemId: editingItem.id,
+            fileName: formData.imagem.name,
+            fileSize: formData.imagem.size,
+            fileType: formData.imagem.type
+          });
 
-        try {
-          const imagemUrl = await itemService.uploadImage(updatedItem.id, formData.imagem);
-          console.log('Imagem enviada:', imagemUrl);
+          const imageUrl = await itemService.uploadImage(editingItem.id, formData.imagem);
+          console.log('Imagem enviada:', imageUrl);
+          
+          // Atualiza o item com todos os dados novos incluindo a imagem e categoria
+          createdOrUpdatedItem = await itemService.updateItem({
+            ...editingItem,
+            ...itemData,
+            categoria: categoria, // Garante que a categoria está correta
+            imagemUrl: imageUrl
+          });
+        } else {
+          // Cria o item primeiro com a categoria correta
+          createdOrUpdatedItem = await itemService.createItem({
+            ...itemData,
+            categoria: categoria // Garante que a categoria está correta
+          });
+          console.log('Item criado:', createdOrUpdatedItem);
 
-          console.log('Aguardando processamento da imagem...');
-          await new Promise(resolve => setTimeout(resolve, 5000));
+          // Faz upload da imagem
+          console.log('Iniciando upload da imagem para novo item...', {
+            itemId: createdOrUpdatedItem.id,
+            fileName: formData.imagem.name,
+            fileSize: formData.imagem.size,
+            fileType: formData.imagem.type
+          });
 
-          try {
-            updatedItem = await itemService.updateItem({
-              ...updatedItem,
-              imagemUrl
-            });
-            console.log('Item atualizado com imagem:', updatedItem);
-          } catch (updateError) {
-            console.error('Erro ao atualizar item com URL da imagem:', updateError);
-            setError('Item salvo com sucesso, mas houve um erro ao vincular a imagem.');
-            return;
-          }
-        } catch (uploadError) {
-          console.error('Erro no upload da imagem:', uploadError);
-          setError(uploadError instanceof Error ? uploadError.message : 'Erro ao fazer upload da imagem.');
-          return;
+          const imageUrl = await itemService.uploadImage(createdOrUpdatedItem.id, formData.imagem);
+          console.log('Imagem enviada:', imageUrl);
+
+          // Atualiza o item com a URL da imagem mantendo a categoria
+          createdOrUpdatedItem = await itemService.updateItem({
+            ...createdOrUpdatedItem,
+            categoria: categoria, // Garante que a categoria está correta
+            imagemUrl: imageUrl
+          });
+        }
+      } else {
+        // Se não tem imagem nova, apenas cria/atualiza o item normalmente
+        if (editingItem) {
+          createdOrUpdatedItem = await itemService.updateItem({
+            ...editingItem,
+            ...itemData,
+            categoria: categoria // Garante que a categoria está correta
+          });
+        } else {
+          createdOrUpdatedItem = await itemService.createItem({
+            ...itemData,
+            categoria: categoria // Garante que a categoria está correta
+          });
         }
       }
 
-      // Limpar o formulário
-      handleCancel();
       setSuccess(true);
-
-      // Atualizar a lista de itens
-      await loadItems();
-
+      handleCancel(); // Limpa o formulário
+      await loadItems(); // Recarrega a lista
     } catch (error) {
       console.error('Erro ao salvar item:', error);
-      setError(error instanceof Error ? error.message : 'Erro ao salvar item');
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Erro ao salvar item. Por favor, tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteClick = (item: Item) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      await itemService.deleteItem(itemToDelete.id);
+      setSuccess(true);
+      await loadItems();
+    } catch (error) {
+      console.error('Erro ao deletar item:', error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Erro ao deletar item. Por favor, tente novamente.');
+      }
+    } finally {
+      setLoading(false);
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setItemToDelete(null);
   };
 
   return (
@@ -237,20 +396,15 @@ const AdminPage: React.FC = () => {
               fullWidth
             />
 
-            <FormControl fullWidth required>
-              <InputLabel>Categoria</InputLabel>
-              <Select
-                value={formData.categoria}
-                onChange={handleCategoriaChange}
-                label="Categoria"
-              >
-                {categorias.map(cat => (
-                  <MenuItem key={cat} value={cat}>
-                    {cat}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <TextField
+              label="Nova Categoria"
+              name="categoria"
+              value={formData.categoria}
+              onChange={handleInputChange}
+              required
+              fullWidth
+              helperText="Digite o nome da nova categoria"
+            />
 
             <TextField
               label="Preço"
@@ -371,7 +525,7 @@ const AdminPage: React.FC = () => {
                     {item.imagemUrl ? (
                       <img
                         src={item.imagemUrl}
-                        alt={item.nome || 'Item sem nome'}
+                        alt={item.nome}
                         style={{ width: 50, height: 50, objectFit: 'cover' }}
                       />
                     ) : (
@@ -389,8 +543,8 @@ const AdminPage: React.FC = () => {
                       </Box>
                     )}
                   </TableCell>
-                  <TableCell>{item.nome || 'Sem nome'}</TableCell>
-                  <TableCell>{item.categoria}</TableCell>
+                  <TableCell>{item.nome}</TableCell>
+                  <TableCell>{getCategoriaDisplay(item.categoria)}</TableCell>
                   <TableCell>
                     {new Intl.NumberFormat('pt-BR', {
                       style: 'currency',
@@ -398,13 +552,22 @@ const AdminPage: React.FC = () => {
                     }).format(item.preco)}
                   </TableCell>
                   <TableCell>
-                    <IconButton
-                      onClick={() => handleEdit(item)}
-                      color="primary"
-                      title="Editar"
-                    >
-                      <EditIcon />
-                    </IconButton>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <IconButton
+                        onClick={() => handleEdit(item)}
+                        color="primary"
+                        title="Editar"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleDeleteClick(item)}
+                        color="error"
+                        title="Deletar"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
@@ -412,6 +575,27 @@ const AdminPage: React.FC = () => {
           </Table>
         </TableContainer>
       </Paper>
+
+      {/* Dialog de Confirmação de Deleção */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+      >
+        <DialogTitle>Confirmar Exclusão</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Tem certeza que deseja excluir o item "{itemToDelete?.nome}"? Esta ação não pode ser desfeita.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : 'Excluir'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

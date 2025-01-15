@@ -170,3 +170,30 @@ src/
 - Sistema: trimestral
 - Segurança: imediato
 - Framework: por LTS
+
+## Frontend
+
+### Tecnologias Principais
+- React com TypeScript
+- Material-UI para componentes
+- Context API para gerenciamento de estado
+- React Router para navegação
+- Auth0 para autenticação
+
+### Gerenciamento de Estado
+- Context API para estado global
+- useState e useReducer para estado local
+- Gerenciamento de categorias centralizado
+- Cache local para otimização
+
+### Validação e Tipos
+- TypeScript para tipagem estática
+- Zod para validação de schemas
+- Interfaces para modelos de dados
+- Type guards para segurança de tipos
+
+### Categorias e Itens
+- Associação dinâmica entre itens e categorias
+- Validação de tipos para categorias
+- Cache de categorias para performance
+- Atualização otimista de UI

@@ -1,49 +1,79 @@
-# Product Context
+# Contexto do Produto
 
-## Business Overview
-The Cuattro Backend API powers the digital operations of a buffet management system, enabling efficient order processing, user management, and menu administration.
+## Visão Geral
+O Cuattro é uma plataforma de gerenciamento de pedidos para restaurantes, focada em proporcionar uma experiência eficiente tanto para clientes quanto para estabelecimentos.
 
-## Core Features
-1. User Management:
-   - Role-based access control (Administrador, Cliente, Empregado)
-   - Secure authentication via Auth0
-   - User profile management
+## Funcionalidades Core
+1. **Gerenciamento de Cardápio**
+   - Cadastro e edição de items
+   - Categorização de produtos
+   - Upload de imagens
+   - Controle de disponibilidade
 
-2. Menu Management:
-   - Create, read, update, and delete menu items
-   - Detailed item descriptions and pricing
-   - Categorization and organization of items
+2. **Sistema de Pedidos**
+   - Carrinho de compras
+   - Processamento de pedidos
+   - Acompanhamento em tempo real
+   - Histórico de pedidos
 
-3. Order Processing:
-   - Shopping cart functionality
-   - Order status tracking (Criado > Pago > EmProducao > Entregue)
-   - Delivery information management
+3. **Gestão de Usuários**
+   - Autenticação segura
+   - Perfis de acesso
+   - Preferências do usuário
+   - Histórico de atividades
 
-4. Reporting and Analytics:
-   - Sales tracking
-   - Popular item analysis
-   - User activity monitoring
+4. **Dashboard e Relatórios**
+   - Métricas de vendas
+   - Análise de desempenho
+   - Relatórios personalizados
+   - Insights de negócio
 
-## Business Benefits
-- Streamlined order processing
-- Improved customer experience
-- Enhanced operational efficiency
-- Real-time data insights
-- Scalable architecture for future growth
+## Benefícios
+1. **Para Restaurantes**
+   - Gestão eficiente de pedidos
+   - Redução de erros operacionais
+   - Análise de dados para decisões
+   - Melhor experiência do cliente
 
-## User Roles
-1. Administrador:
-   - Full system access
-   - User management
-   - Menu configuration
-   - Reporting access
+2. **Para Clientes**
+   - Interface intuitiva
+   - Pedidos personalizados
+   - Acompanhamento em tempo real
+   - Histórico detalhado
 
-2. Cliente:
-   - Browse menu
-   - Create and manage orders
-   - View order history
+## Perfis de Usuário
+1. **Administrador**
+   - Gestão completa do sistema
+   - Configurações avançadas
+   - Relatórios gerenciais
 
-3. Empregado:
-   - Process orders
-   - Update order status
-   - Manage deliveries
+2. **Cliente**
+   - Visualização do cardápio
+   - Realização de pedidos
+   - Acompanhamento de status
+
+3. **Empregado**
+   - Gestão de pedidos
+   - Atualização de status
+   - Atendimento ao cliente
+
+## Roadmap 2024
+1. **Q1**
+   - Implementação de upload de imagens
+   - Otimização de performance
+   - Sistema de cache
+
+2. **Q2**
+   - Testes automatizados
+   - Monitoramento
+   - Novos endpoints
+
+3. **Q3**
+   - Sistema de notificações
+   - Integração com delivery
+   - Analytics avançado
+
+4. **Q4**
+   - Mobile app
+   - Fidelização
+   - Integrações de pagamento

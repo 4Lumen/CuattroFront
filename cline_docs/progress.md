@@ -13,12 +13,15 @@
 - ✅ Upload e preview de imagens
 - ✅ Edição de itens existentes
 - ✅ Validação de formulários
+- ✅ Gerenciamento de categorias
+- ✅ Associação de itens com categorias
 
 ### Interface do Usuário
 - ✅ Layout responsivo
 - ✅ Tema personalizado Material-UI
 - ✅ Componentes reutilizáveis
 - ✅ Feedback visual para ações
+- ✅ Exibição organizada por categorias
 
 ## Em Desenvolvimento
 
@@ -72,6 +75,7 @@
 - Backup automático
 
 ## Status do Projeto
-- **Versão Atual**: 0.1.0
+- **Versão Atual**: 0.2.0
 - **Última Atualização**: Janeiro 2024
 - **Status**: Em desenvolvimento ativo
+- **Últimas Melhorias**: Implementação completa do sistema de categorias

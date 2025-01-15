@@ -1,149 +1,215 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Grid, Container, CircularProgress, Alert, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Container, Grid, Typography, CircularProgress } from '@mui/material';
 import { useCart } from '../hooks/useCart';
-import { useAppContext } from '../context/AppContext';
-import { Item } from '../types';
-import itemService from '../services/itemService';
-import MenuFilter from '../components/MenuFilter';
+import { Item } from '../services/itemService';
+import ItemService from '../services/itemService';
 import MenuItem from '../components/MenuItem';
-import { AxiosError } from 'axios';
+import categoriaService, { Categoria } from '../services/categoriaService';
 
 const CustomerPage: React.FC = () => {
+  const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
-  const { state, dispatch } = useAppContext();
-  const { addToCart, removeFromCart, getItemQuantity } = useCart();
-
-  const fetchItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const items = await itemService.getItems();
-      if (Array.isArray(items)) {
-        dispatch({ type: 'SET_ITEMS', payload: items });
-      } else {
-        throw new Error('Formato de dados inválido');
-      }
-    } catch (error) {
-      console.error('Erro ao buscar itens:', error);
-      if (error instanceof AxiosError) {
-        if (error.code === 'ECONNABORTED') {
-          setError('A conexão expirou. Por favor, tente novamente.');
-        } else if (error.response) {
-          setError(`Erro ${error.response.status}: ${error.response.data.message || 'Erro desconhecido'}`);
-        } else if (error.request) {
-          setError('Não foi possível conectar ao servidor. Verifique sua conexão.');
-        } else {
-          setError(error.message);
-        }
-      } else if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError('Erro ao carregar os itens. Por favor, tente novamente mais tarde.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [dispatch]);
+  const { addToCart, removeFromCart, items: cartItems } = useCart();
 
   useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+    const fetchItems = async () => {
+      try {
+        // Primeiro carrega todas as categorias
+        console.log('Iniciando carregamento das categorias...');
+        const categorias = await categoriaService.getCategorias();
+        console.log('Categorias carregadas:', categorias);
 
-  const filteredItems = selectedCategory === 'Todos'
-    ? state.items
-    : state.items.filter(item => item.categoria === selectedCategory);
+        if (!categorias || categorias.length === 0) {
+          console.warn('Nenhuma categoria foi carregada do backend, usando categoria padrão');
+        }
 
-  const handleAddToCart = async (item: Item) => {
-    try {
-      setError(null);
-      await addToCart(item, 1);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError('Erro ao adicionar item ao carrinho');
+        // Depois carrega os itens
+        console.log('Iniciando carregamento dos itens...');
+        const fetchedItems = await ItemService.getItems();
+        console.log('Itens carregados:', fetchedItems);
+        
+        // Associa as categorias corretas aos itens
+        const itemsWithCategories = fetchedItems.map(item => {
+          console.log('Processando item:', item.nome, 'com categoria:', item.categoria, 'e categoriaId:', item.categoriaId);
+          
+          // Primeiro tenta pelo categoriaId
+          if (item.categoriaId) {
+            const categoria = categorias.find(c => c.id === item.categoriaId);
+            if (categoria) {
+              console.log(`Categoria encontrada por ID ${item.categoriaId} para o item ${item.nome}:`, categoria);
+              return { ...item, categoria };
+            }
+          }
+          
+          // Se não achou por ID, tenta pelo objeto categoria
+          if (item.categoria && typeof item.categoria === 'object' && 'id' in item.categoria) {
+            const categoriaId = item.categoria.id;
+            const categoria = categorias.find(c => c.id === categoriaId);
+            if (categoria) {
+              console.log(`Categoria encontrada por ID para o item ${item.nome}:`, categoria);
+              return { ...item, categoria };
+            }
+          }
+          
+          // Se não achou por ID, tenta pelo nome
+          if (item.categoria && typeof item.categoria === 'string') {
+            const categoriaNome = item.categoria;
+            const categoria = categorias.find(c => 
+              c.nome && c.nome.toLowerCase() === categoriaNome.toLowerCase()
+            );
+            if (categoria) {
+              console.log(`Categoria encontrada por nome para o item ${item.nome}:`, categoria);
+              return { ...item, categoria };
+            }
+          }
+          
+          // Se não encontrou categoria válida
+          const categoriaDefault = { 
+            id: 0, 
+            nome: 'Sem Categoria', 
+            descricao: 'Sem Categoria', 
+            ordem: 0, 
+            ativa: true 
+          };
+          console.log(`Usando categoria padrão para o item ${item.nome}:`, categoriaDefault);
+          return { ...item, categoria: categoriaDefault };
+        });
+        
+        // Ordena os itens por categoria e nome
+        const itemsOrdenados = itemsWithCategories.sort((a, b) => {
+          const catA = getCategoriaDisplay(a.categoria).toLowerCase();
+          const catB = getCategoriaDisplay(b.categoria).toLowerCase();
+          if (catA === catB) {
+            return a.nome.localeCompare(b.nome);
+          }
+          if (catA === 'sem categoria') return 1;
+          if (catB === 'sem categoria') return -1;
+          return catA.localeCompare(catB);
+        });
+        
+        console.log('Itens com categorias processados:', itemsOrdenados);
+        setItems(itemsOrdenados);
+        setError(null);
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        setError('Erro ao carregar os itens. Por favor, tente novamente mais tarde.');
+      } finally {
+        setLoading(false);
       }
+    };
+
+    fetchItems();
+  }, []);
+
+  const handleAddToCart = (item: Item) => {
+    try {
+      addToCart(item);
+    } catch (error) {
+      console.error('Erro ao adicionar item ao carrinho:', error);
+      setError('Erro ao adicionar item ao carrinho. Por favor, tente novamente.');
     }
   };
 
-  const handleRemoveFromCart = async (itemId: number) => {
+  const handleRemoveFromCart = (itemId: number) => {
     try {
-      setError(null);
-      await removeFromCart(itemId);
+      removeFromCart(itemId);
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError('Erro ao remover item do carrinho');
-      }
+      console.error('Erro ao remover item do carrinho:', error);
+      setError('Erro ao remover item do carrinho. Por favor, tente novamente.');
     }
+  };
+
+  const getItemQuantityInCart = (itemId: number): number => {
+    const cartItem = cartItems.find(item => item.item.id === itemId);
+    return cartItem ? cartItem.quantity : 0;
+  };
+
+  const getCategoriaDisplay = (categoria: string | Categoria | undefined): string => {
+    if (!categoria) {
+      console.log('Categoria undefined, retornando "Sem Categoria"');
+      return 'Sem Categoria';
+    }
+    
+    if (typeof categoria === 'string') {
+      console.log('Categoria é string:', categoria);
+      return categoria;
+    }
+    
+    if ('nome' in categoria && categoria.nome) {
+      console.log('Categoria é objeto com nome:', categoria.nome);
+      return categoria.nome;
+    }
+    
+    console.log('Categoria inválida:', categoria);
+    return 'Sem Categoria';
+  };
+
+  const getCategoriaId = (categoria: string | Categoria | undefined): string => {
+    if (!categoria) {
+      return 'sem-categoria';
+    }
+    
+    if (typeof categoria === 'string') {
+      return categoria.toLowerCase();
+    }
+    
+    if ('id' in categoria && categoria.id !== undefined) {
+      return categoria.id.toString();
+    }
+    
+    return 'sem-categoria';
   };
 
   if (loading) {
     return (
-      <Container className="flex items-center justify-center min-h-screen">
+      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
         <CircularProgress />
       </Container>
     );
   }
 
-  return (
-    <Container maxWidth="lg" className="py-8">
-      {error && (
-        <Alert 
-          severity="error" 
-          className="mb-4" 
-          action={
-            <Button color="inherit" size="small" onClick={fetchItems}>
-              Tentar Novamente
-            </Button>
-          }
-        >
+  if (error) {
+    return (
+      <Container>
+        <Typography color="error" align="center">
           {error}
-        </Alert>
-      )}
+        </Typography>
+      </Container>
+    );
+  }
 
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={3}>
-          <MenuFilter
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
-        </Grid>
-        <Grid item xs={12} md={9}>
+  // Agrupa os itens por categoria
+  const categoriaMap = new Map<string, Item[]>();
+  items.forEach(item => {
+    const categoriaKey = getCategoriaId(item.categoria);
+    if (!categoriaMap.has(categoriaKey)) {
+      categoriaMap.set(categoriaKey, []);
+    }
+    categoriaMap.get(categoriaKey)?.push(item);
+  });
+
+  return (
+    <Container>
+      {Array.from(categoriaMap.entries()).map(([categoriaKey, categoriaItems]) => (
+        <div key={categoriaKey}>
+          <Typography variant="h4" component="h2" gutterBottom sx={{ mt: 4 }}>
+            {getCategoriaDisplay(categoriaItems[0]?.categoria)}
+          </Typography>
           <Grid container spacing={3}>
-            {filteredItems.length > 0 ? (
-              filteredItems.map((item) => (
-                <Grid item xs={12} sm={6} md={4} key={item.id}>
-                  <MenuItem
-                    item={item}
-                    quantity={getItemQuantity(item.id)}
-                    onAdd={() => handleAddToCart(item)}
-                    onRemove={() => handleRemoveFromCart(item.id)}
-                  />
-                </Grid>
-              ))
-            ) : (
-              <Grid item xs={12}>
-                <Alert 
-                  severity="info"
-                  action={
-                    error && (
-                      <Button color="inherit" size="small" onClick={fetchItems}>
-                        Tentar Novamente
-                      </Button>
-                    )
-                  }
-                >
-                  {error ? 'Não foi possível carregar os itens.' : 'Nenhum item encontrado nesta categoria.'}
-                </Alert>
+            {categoriaItems.map(item => (
+              <Grid item xs={12} sm={6} md={4} key={item.id}>
+                <MenuItem
+                  item={item}
+                  onAdd={() => handleAddToCart(item)}
+                  onRemove={() => handleRemoveFromCart(item.id)}
+                  quantity={getItemQuantityInCart(item.id)}
+                />
               </Grid>
-            )}
+            ))}
           </Grid>
-        </Grid>
-      </Grid>
+        </div>
+      ))}
     </Container>
   );
 };

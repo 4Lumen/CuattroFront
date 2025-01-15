@@ -1,104 +1,77 @@
 import React, { createContext, useReducer, useContext, ReactNode } from 'react';
-import { Item } from '../types';
+import { Item } from '../services/itemService';
 
 type CartItem = {
   item: Item;
   quantity: number;
 };
 
-type CartState = {
+interface CartState {
   items: CartItem[];
   total: number;
-};
+}
 
 type CartAction =
-  | { type: 'ADD_ITEM'; payload: Item }
+  | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: number }
-  | { type: 'UPDATE_QUANTITY'; payload: { itemId: number; quantity: number } }
   | { type: 'CLEAR_CART' };
 
-const CartContext = createContext<{
+interface CartContextType {
   state: CartState;
   dispatch: React.Dispatch<CartAction>;
-} | null>(null);
+}
+
+export const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existingItem = state.items.find(
-        (cartItem) => cartItem.item.id === action.payload.id
+      const existingItemIndex = state.items.findIndex(
+        item => item.item.id === action.payload.item.id
       );
-      
-      if (existingItem) {
+
+      if (existingItemIndex >= 0) {
+        const updatedItems = [...state.items];
+        updatedItems[existingItemIndex].quantity += action.payload.quantity;
         return {
           ...state,
-          items: state.items.map((cartItem) =>
-            cartItem.item.id === action.payload.id
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
-              : cartItem
-          ),
-          total: state.total + action.payload.preco,
+          items: updatedItems,
+          total: calculateTotal(updatedItems)
         };
       }
-      
+
+      const newItems = [...state.items, action.payload];
       return {
         ...state,
-        items: [...state.items, { item: action.payload, quantity: 1 }],
-        total: state.total + action.payload.preco,
+        items: newItems,
+        total: calculateTotal(newItems)
       };
     }
-    
     case 'REMOVE_ITEM': {
-      const itemToRemove = state.items.find(
-        (cartItem) => cartItem.item.id === action.payload
-      );
-      
-      if (!itemToRemove) return state;
-      
+      const updatedItems = state.items.filter(item => item.item.id !== action.payload);
       return {
         ...state,
-        items: state.items.filter(
-          (cartItem) => cartItem.item.id !== action.payload
-        ),
-        total: state.total - itemToRemove.item.preco * itemToRemove.quantity,
+        items: updatedItems,
+        total: calculateTotal(updatedItems)
       };
     }
-    
-    case 'UPDATE_QUANTITY': {
-      const { itemId, quantity } = action.payload;
-      const itemToUpdate = state.items.find(
-        (cartItem) => cartItem.item.id === itemId
-      );
-      
-      if (!itemToUpdate || quantity < 1) return state;
-      
-      const priceDifference =
-        (quantity - itemToUpdate.quantity) * itemToUpdate.item.preco;
-        
-      return {
-        ...state,
-        items: state.items.map((cartItem) =>
-          cartItem.item.id === itemId
-            ? { ...cartItem, quantity }
-            : cartItem
-        ),
-        total: state.total + priceDifference,
-      };
-    }
-    
     case 'CLEAR_CART':
-      return { items: [], total: 0 };
-      
+      return {
+        ...state,
+        items: [],
+        total: 0
+      };
     default:
       return state;
   }
 };
 
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, {
-    items: [],
-    total: 0,
-  });
+const calculateTotal = (items: CartItem[]): number => {
+  return items.reduce((total, item) => total + item.item.preco * item.quantity, 0);
+};
+
+export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [state, dispatch] = useReducer(cartReducer, { items: [], total: 0 });
 
   return (
     <CartContext.Provider value={{ state, dispatch }}>

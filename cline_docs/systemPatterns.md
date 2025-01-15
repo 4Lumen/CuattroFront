@@ -7,16 +7,25 @@
    - Componentes reutilizáveis
    - Props tipadas com TypeScript
    - Composição sobre herança
+   - Gerenciamento de estado hierárquico
 
 2. **Context API Pattern**
    - Estado global distribuído
    - Providers hierárquicos
    - Hooks personalizados
+   - Compartilhamento de dados entre componentes
 
 3. **Container/Presenter Pattern**
    - Separação de lógica e apresentação
    - Componentes inteligentes vs. apresentacionais
    - Reusabilidade maximizada
+   - Gerenciamento de estado isolado
+
+4. **Category Management Pattern**
+   - Hierarquia de categorias
+   - Associação dinâmica com itens
+   - Cache de categorias
+   - Validação de tipos
 
 ### Backend
 1. **Clean Architecture**
@@ -77,11 +86,13 @@
    - Estado global tipado
    - Ações previsíveis
    - Updates imutáveis
+   - Gerenciamento de categorias centralizado
 
 2. **Local State**
    - useState para estado simples
    - useReducer para estado complexo
    - Props para dados estáticos
+   - Cache local de categorias
 
 3. **Cache Management**
    - Cache de dados
