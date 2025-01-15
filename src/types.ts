@@ -1,12 +1,4 @@
-export interface Item {
-  id: number;
-  nome: string | null;
-  descricao: string | null;
-  preco: number;
-  imagemUrl: string;
-  categoria: string;
-  itensCarrinho?: ItemCarrinho[];
-}
+import { Item } from './services/itemService';
 
 export interface Carrinho {
   id: number;

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Item } from '../types';
-import ItemService from '../services/itemService';
+import ItemService, { Item } from '../services/itemService';
 
 const { getItems } = ItemService;
 
@@ -35,7 +34,7 @@ const ItemList: React.FC = () => {
           {item.imagemUrl && (
             <img 
               src={item.imagemUrl} 
-              alt={item.nome || 'Item image'}
+              alt={item.nome}
               className="w-full h-48 object-cover mb-4 rounded"
             />
           )}

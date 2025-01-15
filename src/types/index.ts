@@ -7,24 +7,29 @@ export interface User {
   picture?: string;
 }
 
+export interface Categoria {
+  id: number;
+  nome: string;
+  descricao: string;
+  ordem: number;
+  ativa: boolean;
+}
+
 export interface Item {
   id: number;
   nome: string;
   descricao: string;
   preco: number;
+  categoria: Categoria | { id: number; nome: string } | string;
   imagemUrl: string;
-  categoria: string;
-  dataCriacao?: string;
-  dataAtualizacao?: string;
-  status?: ItemStatus;
+  itensCarrinho?: ItemCarrinho[];
 }
 
 export interface ItemCarrinho {
   id: number;
-  carrinhoId: number;
-  itemId: number;
   quantidade: number;
-  item?: Item;
+  item: Item;
+  carrinhoId: number;
 }
 
 export interface Carrinho {

@@ -1,79 +1,77 @@
-# Padrões do Sistema
+# System Patterns
 
-## Padrões de Interface
+## Architecture Overview
+- Layered architecture with clear separation of concerns
+- Presentation Layer: Controllers and API endpoints
+- Business Logic Layer: Domain models and services
+- Data Access Layer: Entity Framework Core repositories
+- Storage Layer: MinIO S3 for file storage
 
-### Formulários
-- Validação em tempo real
-- Feedback visual de erros
-- Campos obrigatórios marcados
-- Preview de imagens
-- Botões com estados de loading
+## Design Patterns
+1. Repository Pattern
+   - Entity Framework Core for data access
+   - Generic repository for common operations
+   - Specialized repositories for complex queries
 
-### Tabelas
-- Cabeçalhos claros
-- Preview de imagens em miniatura
-- Formatação de valores monetários
-- Ações contextuais
-- Feedback visual de interações
+2. Service Pattern
+   - Business logic encapsulation
+   - Cross-cutting concerns handling
+   - Service lifetime management
 
-### Feedback
-- Mensagens de sucesso/erro
-- Indicadores de loading
-- Confirmações de ações importantes
-- Tooltips informativos
-- Mensagens de erro detalhadas
+3. Factory Pattern
+   - Object creation abstraction
+   - Complex object initialization
+   - Configuration-based factories
 
-## Padrões de Código
+4. Strategy Pattern
+   - Authentication providers
+   - File storage providers
+   - Payment processing
 
-### TypeScript
-- Interfaces bem definidas
-- Tipos explícitos
-- Enums para valores constantes
-- Type guards quando necessário
-- Generics para reusabilidade
+5. Unit of Work
+   - Transaction management
+   - Data consistency
+   - Atomic operations
 
-### React
-- Componentes funcionais
-- Hooks para estado e efeitos
-- Context para estado global
-- Props tipadas
-- Error boundaries
+## Database Design
+- Code First approach with Entity Framework Core
+- PostgreSQL with SSL encryption
+- Entity relationships:
+  - One-to-Many: Usuario to Carrinho
+  - Many-to-Many: Carrinho to Item through ItemCarrinho
+- Optimized indexes
+- Data integrity constraints
+- Soft delete implementation
 
-### Serviços
-- Métodos assíncronos
-- Tratamento de erros padronizado
-- Logging consistente
-- Retry patterns
-- Circuit breakers
+## Security Patterns
+- JWT-based authentication with Auth0
+- Role-based authorization
+- Input validation and sanitization
+- SSL/TLS encryption
+- Secure file storage with MinIO
+- Environment variable management
+- Secrets handling
 
-## Padrões de API
+## API Design
+- RESTful principles
+- Resource-based routing
+- Consistent response formats
+- Error handling standardization
+- Swagger documentation
+- CORS configuration
 
-### Endpoints
-- RESTful
-- Versionamento
-- Documentação Swagger
-- Rate limiting
-- Caching headers
+## File Storage
+- MinIO S3 integration
+- Automatic URL generation
+- File type validation
+- Size restrictions
+- Secure access control
+- Cleanup procedures
 
-### Respostas
-- Status codes apropriados
-- Mensagens de erro padronizadas
-- Payload consistente
-- Paginação quando necessário
-- HATEOAS links
-
-## Padrões de Segurança
-
-### Autenticação
-- JWT tokens
-- Refresh tokens
-- Role-based access
-- Session management
-- CORS configurado
-
-### Dados
-- Validação de input
-- Sanitização de dados
-- Encryption em trânsito
-- Secure headers
-- Rate limiting
+## Deployment
+- Docker containerization
+- Environment-based configuration
+- Health checks
+- Logging strategy
+- Monitoring setup
+- Backup procedures
