@@ -1,16 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Grid, Typography, CircularProgress } from '@mui/material';
+import { 
+  Container, 
+  Grid, 
+  Typography, 
+  CircularProgress,
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  useTheme,
+  useMediaQuery,
+  Fab,
+  Dialog,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Slide,
+  Chip,
+  Stack as MuiStack
+} from '@mui/material';
+import { TransitionProps } from '@mui/material/transitions';
+import { Menu as MenuIcon, Close as CloseIcon, Remove as RemoveIcon, Add as AddIcon } from '@mui/icons-material';
 import { useCart } from '../hooks/useCart';
 import { Item } from '../services/itemService';
 import ItemService from '../services/itemService';
 import MenuItem from '../components/MenuItem';
 import categoriaService, { Categoria } from '../services/categoriaService';
 
+const drawerWidth = 240;
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const CustomerPage: React.FC = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [quickViewItem, setQuickViewItem] = useState<Item | null>(null);
   const { addToCart, removeFromCart, items: cartItems } = useCart();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -161,21 +200,45 @@ const CustomerPage: React.FC = () => {
     return 'sem-categoria';
   };
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleCategoriaClick = (categoriaKey: string | null) => {
+    setSelectedCategoria(categoriaKey);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+
+  const handleQuickView = (item: Item) => {
+    setQuickViewItem(item);
+  };
+
+  const handleCloseQuickView = () => {
+    setQuickViewItem(null);
+  };
+
   if (loading) {
     return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '80vh' 
+      }}>
         <CircularProgress />
-      </Container>
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Container>
+      <Box sx={{ p: 3 }}>
         <Typography color="error" align="center">
           {error}
         </Typography>
-      </Container>
+      </Box>
     );
   }
 
@@ -189,28 +252,332 @@ const CustomerPage: React.FC = () => {
     categoriaMap.get(categoriaKey)?.push(item);
   });
 
-  return (
-    <Container>
-      {Array.from(categoriaMap.entries()).map(([categoriaKey, categoriaItems]) => (
-        <div key={categoriaKey}>
-          <Typography variant="h4" component="h2" gutterBottom sx={{ mt: 4 }}>
-            {getCategoriaDisplay(categoriaItems[0]?.categoria)}
+  const categorias = Array.from(categoriaMap.entries());
+  const filteredCategorias = selectedCategoria 
+    ? categorias.filter(([key]) => key === selectedCategoria)
+    : categorias;
+
+  const drawer = (
+    <Box sx={{ overflow: 'auto' }}>
+      <List>
+        <ListItem sx={{ mb: 2 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontFamily: '"Playfair Display", serif',
+              fontWeight: 600
+            }}
+          >
+            Categorias
           </Typography>
-          <Grid container spacing={3}>
-            {categoriaItems.map(item => (
-              <Grid item xs={12} sm={6} md={4} key={item.id}>
-                <MenuItem
-                  item={item}
-                  onAdd={() => handleAddToCart(item)}
-                  onRemove={() => handleRemoveFromCart(item.id)}
-                  quantity={getItemQuantityInCart(item.id)}
-                />
+        </ListItem>
+        <ListItem>
+          <ListItemButton 
+            onClick={() => handleCategoriaClick(null)}
+            selected={selectedCategoria === null}
+            sx={{
+              borderRadius: 2,
+              mb: 1,
+              justifyContent: 'flex-start',
+              '&.Mui-selected': {
+                bgcolor: 'primary.light',
+                '&:hover': {
+                  bgcolor: 'primary.light'
+                }
+              }
+            }}
+          >
+            <ListItemText 
+              primary="Todas" 
+              primaryTypographyProps={{
+                fontFamily: '"Montserrat", sans-serif',
+                fontWeight: 500,
+                color: selectedCategoria === null ? 'primary.main' : 'inherit'
+              }}
+            />
+          </ListItemButton>
+        </ListItem>
+        {categorias.map(([categoriaKey, categoriaItems]) => (
+          <ListItem key={categoriaKey}>
+            <ListItemButton
+              onClick={() => handleCategoriaClick(categoriaKey)}
+              selected={selectedCategoria === categoriaKey}
+              sx={{
+                borderRadius: 2,
+                mb: 1,
+                justifyContent: 'flex-start',
+                '&.Mui-selected': {
+                  bgcolor: 'primary.light',
+                  '&:hover': {
+                    bgcolor: 'primary.light'
+                  }
+                }
+              }}
+            >
+              <ListItemText 
+                primary={getCategoriaDisplay(categoriaItems[0]?.categoria)}
+                primaryTypographyProps={{
+                  fontFamily: '"Montserrat", sans-serif',
+                  fontWeight: 500,
+                  color: selectedCategoria === categoriaKey ? 'primary.main' : 'inherit'
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ display: 'flex' }}>
+      {/* Menu Lateral */}
+      <Box
+        component="nav"
+        sx={{
+          width: { md: drawerWidth },
+          flexShrink: { md: 0 }
+        }}
+      >
+        {/* Versão mobile do menu */}
+        {isMobile && (
+          <Fab
+            color="primary"
+            aria-label="open menu"
+            onClick={handleDrawerToggle}
+            sx={{
+              position: 'fixed',
+              bottom: 16,
+              right: 16,
+              zIndex: 1000
+            }}
+          >
+            <MenuIcon />
+          </Fab>
+        )}
+        
+        {/* Menu drawer para mobile */}
+        <Drawer
+          variant={isMobile ? 'temporary' : 'permanent'}
+          open={isMobile ? mobileOpen : true}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true // Melhor performance em mobile
+          }}
+          sx={{
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              bgcolor: 'background.paper'
+            }
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+
+      {/* Conteúdo Principal */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { md: `calc(100% - ${drawerWidth}px)` }
+        }}
+      >
+        {filteredCategorias.map(([categoriaKey, categoriaItems]) => (
+          <Box key={categoriaKey} sx={{ mb: 6 }}>
+            <Typography 
+              variant="h4" 
+              component="h2" 
+              gutterBottom 
+              sx={{ 
+                mb: 4,
+                fontFamily: '"Playfair Display", serif',
+                fontWeight: 600
+              }}
+            >
+              {getCategoriaDisplay(categoriaItems[0]?.categoria)}
+            </Typography>
+            <Grid container spacing={3}>
+              {categoriaItems.map(item => (
+                <Grid item xs={12} sm={6} md={4} key={item.id}>
+                  <MenuItem
+                    item={item}
+                    onAdd={() => handleAddToCart(item)}
+                    onRemove={() => handleRemoveFromCart(item.id)}
+                    quantity={getItemQuantityInCart(item.id)}
+                    onQuickView={() => handleQuickView(item)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        ))}
+      </Box>
+
+      {/* Modal de Visualização Rápida */}
+      <Dialog
+        fullScreen={isMobile}
+        open={quickViewItem !== null}
+        onClose={handleCloseQuickView}
+        TransitionComponent={Transition}
+        PaperProps={{
+          sx: {
+            bgcolor: 'background.paper',
+            maxWidth: 'md',
+            maxHeight: '90vh'
+          }
+        }}
+      >
+        {quickViewItem && (
+          <>
+            {isMobile && (
+              <AppBar sx={{ position: 'relative' }}>
+                <Toolbar>
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    onClick={handleCloseQuickView}
+                    aria-label="close"
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography 
+                    sx={{ 
+                      ml: 2, 
+                      flex: 1,
+                      fontFamily: '"Playfair Display", serif'
+                    }}
+                    variant="h6"
+                  >
+                    {quickViewItem.nome}
+                  </Typography>
+                </Toolbar>
+              </AppBar>
+            )}
+            <Box sx={{ p: { xs: 2, md: 4 } }}>
+              <Grid container spacing={4}>
+                <Grid item xs={12} md={6}>
+                  {quickViewItem.imagemUrl && (
+                    <Box
+                      component="img"
+                      src={quickViewItem.imagemUrl}
+                      alt={quickViewItem.nome}
+                      sx={{
+                        width: '100%',
+                        height: 'auto',
+                        borderRadius: 2,
+                        boxShadow: 1
+                      }}
+                    />
+                  )}
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <MuiStack spacing={3}>
+                    {quickViewItem.categoria && (
+                      <Chip
+                        label={typeof quickViewItem.categoria === 'string' 
+                          ? quickViewItem.categoria 
+                          : quickViewItem.categoria.nome
+                        }
+                        size="small"
+                        sx={{
+                          alignSelf: 'flex-start',
+                          bgcolor: 'primary.main',
+                          color: 'primary.contrastText',
+                          fontFamily: '"Roboto Condensed", sans-serif'
+                        }}
+                      />
+                    )}
+                    <Typography 
+                      variant="h4"
+                      sx={{
+                        fontFamily: '"Playfair Display", serif',
+                        fontWeight: 600
+                      }}
+                    >
+                      {quickViewItem.nome}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{
+                        fontFamily: '"Roboto", sans-serif',
+                        fontSize: '1rem',
+                        lineHeight: 1.7
+                      }}
+                    >
+                      {quickViewItem.descricao}
+                    </Typography>
+                    <Typography 
+                      variant="h4"
+                      sx={{
+                        fontFamily: '"Montserrat", sans-serif',
+                        fontWeight: 600,
+                        color: 'primary.main'
+                      }}
+                    >
+                      {new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }).format(quickViewItem.preco)}
+                    </Typography>
+                    <Box sx={{ mt: 2 }}>
+                      <MuiStack 
+                        direction="row" 
+                        spacing={2} 
+                        alignItems="center"
+                      >
+                        <IconButton 
+                          onClick={() => handleRemoveFromCart(quickViewItem.id)}
+                          disabled={getItemQuantityInCart(quickViewItem.id) === 0}
+                          sx={{
+                            color: 'primary.main',
+                            bgcolor: 'primary.light',
+                            '&:hover': {
+                              bgcolor: 'primary.light',
+                              transform: 'scale(1.1)'
+                            }
+                          }}
+                        >
+                          <RemoveIcon />
+                        </IconButton>
+                        <Typography 
+                          sx={{ 
+                            fontFamily: '"Montserrat", sans-serif',
+                            fontWeight: 600,
+                            minWidth: 40,
+                            textAlign: 'center'
+                          }}
+                        >
+                          {getItemQuantityInCart(quickViewItem.id)}
+                        </Typography>
+                        <IconButton 
+                          onClick={() => handleAddToCart(quickViewItem)}
+                          sx={{
+                            color: 'primary.main',
+                            bgcolor: 'primary.light',
+                            '&:hover': {
+                              bgcolor: 'primary.light',
+                              transform: 'scale(1.1)'
+                            }
+                          }}
+                        >
+                          <AddIcon />
+                        </IconButton>
+                      </MuiStack>
+                    </Box>
+                  </MuiStack>
+                </Grid>
               </Grid>
-            ))}
-          </Grid>
-        </div>
-      ))}
-    </Container>
+            </Box>
+          </>
+        )}
+      </Dialog>
+    </Box>
   );
 };
 

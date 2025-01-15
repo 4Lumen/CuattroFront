@@ -3,50 +3,61 @@ import { createTheme } from '@mui/material/styles';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#FF6B6B',
-      light: '#FF8E8E',
-      dark: '#FF4848',
-      contrastText: '#FFFFFF'
+      main: '#FFA500',
+      light: '#FFB733',
+      dark: '#CC8400',
+      contrastText: '#000000'
     },
     secondary: {
-      main: '#4ECDC4',
-      light: '#71D7D0',
-      dark: '#3BAFA8',
+      main: '#333333',
+      light: '#4D4D4D',
+      dark: '#1A1A1A',
       contrastText: '#FFFFFF'
     },
-    error: {
-      main: '#FF6B6B',
-      light: '#FF8E8E',
-      dark: '#FF4848'
-    },
     background: {
-      default: '#F7F7F7',
+      default: '#F5F5F5',
       paper: '#FFFFFF'
     },
     text: {
-      primary: '#2D3436',
-      secondary: '#636E72'
+      primary: '#333333',
+      secondary: '#666666'
     }
   },
   typography: {
-    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
+      fontFamily: '"Playfair Display", serif',
       fontWeight: 700
     },
     h2: {
+      fontFamily: '"Playfair Display", serif',
       fontWeight: 700
     },
     h3: {
+      fontFamily: '"Playfair Display", serif',
       fontWeight: 600
     },
     h4: {
+      fontFamily: '"Playfair Display", serif',
       fontWeight: 600
     },
     h5: {
-      fontWeight: 500
+      fontFamily: '"Montserrat", sans-serif',
+      fontWeight: 600
     },
     h6: {
-      fontWeight: 500
+      fontFamily: '"Montserrat", sans-serif',
+      fontWeight: 600
+    },
+    subtitle1: {
+      fontFamily: '"Roboto Condensed", sans-serif',
+      fontWeight: 400
+    },
+    body1: {
+      fontFamily: '"Roboto", sans-serif'
+    },
+    body2: {
+      fontFamily: '"Roboto", sans-serif'
     }
   },
   components: {
@@ -55,11 +66,20 @@ const theme = createTheme({
         root: {
           textTransform: 'none',
           borderRadius: '8px',
-          fontWeight: 600
+          fontWeight: 600,
+          fontFamily: '"Montserrat", sans-serif',
+          transition: 'all 0.3s ease-in-out'
         },
         containedPrimary: {
           '&:hover': {
-            backgroundColor: '#FF4848'
+            backgroundColor: '#CC8400',
+            transform: 'translateY(-2px)'
+          }
+        },
+        outlined: {
+          borderWidth: '2px',
+          '&:hover': {
+            borderWidth: '2px'
           }
         }
       }
@@ -68,7 +88,12 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: '12px',
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)',
+          transition: 'all 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0px 8px 30px rgba(0, 0, 0, 0.1)'
+          }
         }
       }
     },
@@ -78,6 +103,15 @@ const theme = createTheme({
           borderRadius: '12px'
         }
       }
+    }
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 768,
+      lg: 1024,
+      xl: 1536
     }
   }
 });
