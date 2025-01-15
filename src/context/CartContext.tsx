@@ -14,6 +14,7 @@ interface CartState {
 type CartAction =
   | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: number }
+  | { type: 'DECREMENT_ITEM'; payload: number }
   | { type: 'CLEAR_CART' };
 
 interface CartContextType {
@@ -32,7 +33,10 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
       if (existingItemIndex >= 0) {
         const updatedItems = [...state.items];
-        updatedItems[existingItemIndex].quantity += action.payload.quantity;
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + action.payload.quantity
+        };
         return {
           ...state,
           items: updatedItems,
@@ -46,6 +50,34 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         items: newItems,
         total: calculateTotal(newItems)
       };
+    }
+    case 'DECREMENT_ITEM': {
+      const existingItemIndex = state.items.findIndex(
+        item => item.item.id === action.payload
+      );
+
+      if (existingItemIndex >= 0) {
+        const updatedItems = [...state.items];
+        const currentQuantity = updatedItems[existingItemIndex].quantity;
+
+        if (currentQuantity <= 1) {
+          // Remove o item se a quantidade for 1 ou menos
+          updatedItems.splice(existingItemIndex, 1);
+        } else {
+          // Decrementa a quantidade em 1
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity: currentQuantity - 1
+          };
+        }
+
+        return {
+          ...state,
+          items: updatedItems,
+          total: calculateTotal(updatedItems)
+        };
+      }
+      return state;
     }
     case 'REMOVE_ITEM': {
       const updatedItems = state.items.filter(item => item.item.id !== action.payload);

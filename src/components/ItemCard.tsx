@@ -45,7 +45,7 @@ const ItemCard: React.FC<ItemCardProps> = ({ item, quantity, onAddToCart, onRemo
           </Typography>
           <IconButton 
             onClick={onAddToCart}
-            color="primary"
+            color="primary"            
           >
             <AddIcon />
           </IconButton>

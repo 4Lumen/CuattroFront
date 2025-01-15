@@ -47,7 +47,7 @@ const CustomerPage: React.FC = () => {
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [quickViewItem, setQuickViewItem] = useState<Item | null>(null);
-  const { addToCart, removeFromCart, items: cartItems } = useCart();
+  const { addToCart, decrementFromCart, removeFromCart, items: cartItems } = useCart();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -143,7 +143,7 @@ const CustomerPage: React.FC = () => {
 
   const handleAddToCart = (item: Item) => {
     try {
-      addToCart(item);
+      addToCart(item, 1);
     } catch (error) {
       console.error('Erro ao adicionar item ao carrinho:', error);
       setError('Erro ao adicionar item ao carrinho. Por favor, tente novamente.');
@@ -152,7 +152,7 @@ const CustomerPage: React.FC = () => {
 
   const handleRemoveFromCart = (itemId: number) => {
     try {
-      removeFromCart(itemId);
+      decrementFromCart(itemId);
     } catch (error) {
       console.error('Erro ao remover item do carrinho:', error);
       setError('Erro ao remover item do carrinho. Por favor, tente novamente.');
@@ -292,7 +292,7 @@ const CustomerPage: React.FC = () => {
               primaryTypographyProps={{
                 fontFamily: '"Montserrat", sans-serif',
                 fontWeight: 500,
-                color: selectedCategoria === null ? 'primary.main' : 'inherit'
+                color: selectedCategoria === null ? '#000000' : 'inherit'
               }}
             />
           </ListItemButton>
@@ -319,7 +319,7 @@ const CustomerPage: React.FC = () => {
                 primaryTypographyProps={{
                   fontFamily: '"Montserrat", sans-serif',
                   fontWeight: 500,
-                  color: selectedCategoria === categoriaKey ? 'primary.main' : 'inherit'
+                  color: selectedCategoria === categoriaKey ? '#000000' : 'inherit'
                 }}
               />
             </ListItemButton>
@@ -330,7 +330,11 @@ const CustomerPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ 
+      display: 'flex',
+      pt: 2,
+      position: 'relative'
+    }}>
       {/* Menu Lateral */}
       <Box
         component="nav"
@@ -362,7 +366,7 @@ const CustomerPage: React.FC = () => {
           open={isMobile ? mobileOpen : true}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true // Melhor performance em mobile
+            keepMounted: true
           }}
           sx={{
             '& .MuiDrawer-paper': {
@@ -370,7 +374,10 @@ const CustomerPage: React.FC = () => {
               width: drawerWidth,
               borderRight: '1px solid',
               borderColor: 'divider',
-              bgcolor: 'background.paper'
+              bgcolor: 'background.paper',
+              position: 'relative',
+              height: 'calc(100vh - 100px)',
+              marginTop: '16px'
             }
           }}
         >
@@ -487,7 +494,7 @@ const CustomerPage: React.FC = () => {
                         sx={{
                           alignSelf: 'flex-start',
                           bgcolor: 'primary.main',
-                          color: 'primary.contrastText',
+                          color: '#000000',
                           fontFamily: '"Roboto Condensed", sans-serif'
                         }}
                       />
