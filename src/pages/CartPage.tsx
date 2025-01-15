@@ -1,10 +1,39 @@
-import React from 'react';
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Box } from '@mui/material';
+import React, { useState } from 'react';
+import { 
+  Container, 
+  Typography, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper, 
+  IconButton, 
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Snackbar,
+  Alert
+} from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useCart } from '../hooks/useCart';
+import PedidoService from '../services/pedidoService';
 
 const CartPage: React.FC = () => {
-  const { items, total, addToCart, decrementFromCart } = useCart();
+  const { items, total, addToCart, decrementFromCart, clearCart } = useCart();
+  const [openDialog, setOpenDialog] = useState(false);
+  const [formaPagamento, setFormaPagamento] = useState<string>('Dinheiro');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   if (items.length === 0) {
     return (
@@ -15,6 +44,33 @@ const CartPage: React.FC = () => {
       </Container>
     );
   }
+
+  const handleFinalizarPedido = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('Iniciando finalização do pedido...');
+      
+      if (items.length === 0) {
+        throw new Error('O carrinho está vazio');
+      }
+
+      await PedidoService.createPedido(items, formaPagamento);
+      console.log('Pedido criado com sucesso');
+      clearCart();
+      setSuccess(true);
+      setOpenDialog(false);
+    } catch (error) {
+      console.error('Erro ao finalizar pedido:', error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Erro ao finalizar pedido. Por favor, tente novamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Container>
@@ -95,6 +151,64 @@ const CartPage: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          onClick={() => setOpenDialog(true)}
+          disabled={loading}
+        >
+          {loading ? 'Processando...' : 'Finalizar Pedido'}
+        </Button>
+      </Box>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Forma de Pagamento</DialogTitle>
+        <DialogContent>
+          <FormControl component="fieldset">
+            <RadioGroup
+              value={formaPagamento}
+              onChange={(e) => setFormaPagamento(e.target.value)}
+            >
+              <FormControlLabel value="Dinheiro" control={<Radio />} label="Dinheiro" />
+              <FormControlLabel value="Cartao" control={<Radio />} label="Cartão" />
+              <FormControlLabel value="Pix" control={<Radio />} label="PIX" />
+            </RadioGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="inherit">
+            Cancelar
+          </Button>
+          <Button onClick={handleFinalizarPedido} color="primary" disabled={loading}>
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar 
+        open={success} 
+        autoHideDuration={6000} 
+        onClose={() => setSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSuccess(false)} severity="success">
+          Pedido realizado com sucesso!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar 
+        open={!!error} 
+        autoHideDuration={6000} 
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setError(null)} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
