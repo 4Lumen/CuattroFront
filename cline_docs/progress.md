@@ -22,6 +22,16 @@
 - ✅ Componentes reutilizáveis
 - ✅ Feedback visual para ações
 - ✅ Exibição organizada por categorias
+- ✅ Menu lateral fixo com categorias
+- ✅ Cards de produto com efeitos hover
+- ✅ Modal de visualização rápida
+- ✅ Tipografia personalizada
+- ✅ Paleta de cores baseada no logo
+- ✅ Animações e transições suaves
+- ✅ Logo da empresa integrado
+- ✅ Menu de categorias com destaque visual
+- ✅ Alinhamento consistente dos elementos
+- ✅ Navegação intuitiva e clara
 
 ## Em Desenvolvimento
 
@@ -29,6 +39,7 @@
 - 🔄 Adição/remoção de itens
 - 🔄 Cálculo de total
 - 🔄 Persistência do carrinho
+- 🔄 Carrinho lateral deslizante
 
 ### Pedidos
 - 🔄 Criação de pedidos
@@ -66,8 +77,13 @@
 
 ### UX/UI
 - Modo escuro
-- Animações suaves
+- Filtros de categoria animados
+- Sistema de busca avançado
 - Feedback mais intuitivo
+- Notificações toast animadas
+- Melhorias na responsividade do menu
+- Aprimoramento dos efeitos visuais
+- Refinamento da paleta de cores
 
 ### Segurança
 - Implementação de rate limiting
@@ -75,7 +91,12 @@
 - Backup automático
 
 ## Status do Projeto
-- **Versão Atual**: 0.2.0
+- **Versão Atual**: 0.3.1
 - **Última Atualização**: Janeiro 2024
 - **Status**: Em desenvolvimento ativo
-- **Últimas Melhorias**: Implementação completa do sistema de categorias
+- **Últimas Melhorias**: 
+  - Implementação do logo da empresa
+  - Refinamento do menu de categorias
+  - Ajuste nos alinhamentos da interface
+  - Melhoria na experiência de navegação
+- **Próxima Atualização**: Implementação do carrinho lateral

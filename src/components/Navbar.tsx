@@ -10,7 +10,10 @@ import {
   ListItemIcon, 
   ListItemText,
   Divider,
-  Badge as MuiBadge
+  Badge as MuiBadge,
+  Stack,
+  Box,
+  Typography
 } from '@mui/material';
 import { 
   ShoppingCart, 
@@ -66,137 +69,232 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo e Nome */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Cuattro" className="h-8 w-auto" />
-            <span className="text-xl font-bold text-gray-800">Cuattro</span>
-          </Link>
+    <Stack 
+      direction={{ xs: 'column', md: 'row' }} 
+      spacing={{ xs: 1, md: 4 }}
+      alignItems="center"
+      width="100%"
+    >
+      {/* Links de Navegação */}
+      <Stack 
+        direction="row" 
+        spacing={2}
+        sx={{ 
+          display: { xs: 'none', md: 'flex' },
+          flex: 1,
+          justifyContent: 'flex-start'
+        }}
+      >
+        <Button
+          component={Link}
+          to="/"
+          color="inherit"
+          sx={{ 
+            fontFamily: 'Montserrat',
+            fontWeight: 500,
+            fontSize: '0.95rem',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+            }
+          }}
+        >
+          Cardápio
+        </Button>
 
-          {/* Links de Navegação */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/" className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">
-              Cardápio
-            </Link>
-            {state.user?.role === Role.Admin && (
-              <Link 
-                to="/admin" 
-                className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium flex items-center"
-              >
-                <AdminPanelSettings className="mr-1" fontSize="small" />
-                Administração
-              </Link>
-            )}
-            {state.user?.role === Role.Funcionario && (
-              <Link 
-                to="/employee" 
-                className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium flex items-center"
-              >
-                <BadgeIcon className="mr-1" fontSize="small" />
-                Área do Funcionário
-              </Link>
-            )}
-          </div>
+        {state.user?.role === Role.Admin && (
+          <Button
+            component={Link}
+            to="/admin"
+            color="inherit"
+            startIcon={<AdminPanelSettings />}
+            sx={{ 
+              fontFamily: 'Montserrat',
+              fontWeight: 500,
+              fontSize: '0.95rem',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
+          >
+            Administração
+          </Button>
+        )}
 
-          {/* Botões de Ação */}
-          <div className="flex items-center space-x-4">
-            {state.user ? (
-              <>
-                <Link to="/cart" className="text-gray-600 hover:text-gray-800">
-                  <IconButton color="inherit">
-                    <MuiBadge 
-                      badgeContent={state.cart?.itensCarrinho?.length || 0} 
-                      color="primary"
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                    >
-                      <ShoppingCart />
-                    </MuiBadge>
-                  </IconButton>
-                </Link>
-                <IconButton
-                  onClick={handleMenuOpen}
-                  size="small"
-                  aria-controls={Boolean(anchorEl) ? 'profile-menu' : undefined}
-                  aria-haspopup="true"
-                  aria-expanded={Boolean(anchorEl) ? 'true' : undefined}
-                >
-                  {state.user.picture ? (
-                    <Avatar 
-                      src={state.user.picture} 
-                      alt={state.user.nome || ''} 
-                      sx={{ width: 32, height: 32 }}
-                    />
-                  ) : (
-                    <Avatar sx={{ width: 32, height: 32 }}>
-                      {state.user.nome?.charAt(0) || 'U'}
-                    </Avatar>
-                  )}
-                </IconButton>
-                <Menu
-                  id="profile-menu"
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  onClick={handleMenuClose}
-                  transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                  anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                >
-                  <MenuItem onClick={() => handleNavigate('/profile')}>
-                    <ListItemIcon>
-                      <Person fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Perfil" />
-                  </MenuItem>
+        {state.user?.role === Role.Funcionario && (
+          <Button
+            component={Link}
+            to="/employee"
+            color="inherit"
+            startIcon={<BadgeIcon />}
+            sx={{ 
+              fontFamily: 'Montserrat',
+              fontWeight: 500,
+              fontSize: '0.95rem',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
+          >
+            Área do Funcionário
+          </Button>
+        )}
+      </Stack>
 
-                  {state.user.role === Role.Admin && (
-                    <MenuItem onClick={() => handleNavigate('/admin')}>
-                      <ListItemIcon>
-                        <AdminPanelSettings fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary="Administração" />
-                    </MenuItem>
-                  )}
-
-                  {state.user.role === Role.Funcionario && (
-                    <MenuItem onClick={() => handleNavigate('/employee')}>
-                      <ListItemIcon>
-                        <BadgeIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary="Área do Funcionário" />
-                    </MenuItem>
-                  )}
-
-                  <Divider />
-
-                  <MenuItem onClick={handleLogout}>
-                    <ListItemIcon>
-                      <ExitToApp fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Sair" />
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Button
-                variant="contained"
+      {/* Botões de Ação */}
+      <Stack 
+        direction="row" 
+        spacing={2}
+        alignItems="center"
+      >
+        {state.user ? (
+          <>
+            <IconButton 
+              component={Link} 
+              to="/cart" 
+              color="inherit"
+              sx={{
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'scale(1.1)'
+                }
+              }}
+            >
+              <MuiBadge 
+                badgeContent={state.cart?.itensCarrinho?.length || 0} 
                 color="primary"
-                startIcon={<Login />}
-                component={Link}
-                to="/login"
-                size="small"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    backgroundColor: theme => theme.palette.primary.main,
+                    color: theme => theme.palette.primary.contrastText
+                  }
+                }}
               >
-                Entrar
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    </nav>
+                <ShoppingCart />
+              </MuiBadge>
+            </IconButton>
+
+            <IconButton
+              onClick={handleMenuOpen}
+              size="small"
+              sx={{
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'scale(1.1)'
+                }
+              }}
+            >
+              {state.user.picture ? (
+                <Avatar 
+                  src={state.user.picture} 
+                  alt={state.user.nome || ''} 
+                  sx={{ width: 32, height: 32 }}
+                />
+              ) : (
+                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                  {state.user.nome?.charAt(0) || 'U'}
+                </Avatar>
+              )}
+            </IconButton>
+
+            <Menu
+              id="profile-menu"
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              onClick={handleMenuClose}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              PaperProps={{
+                elevation: 2,
+                sx: {
+                  mt: 1.5,
+                  borderRadius: 2,
+                  minWidth: 180
+                }
+              }}
+            >
+              <MenuItem onClick={() => handleNavigate('/profile')}>
+                <ListItemIcon>
+                  <Person fontSize="small" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Perfil"
+                  primaryTypographyProps={{
+                    fontFamily: 'Montserrat',
+                    fontSize: '0.95rem'
+                  }}
+                />
+              </MenuItem>
+
+              {state.user.role === Role.Admin && (
+                <MenuItem onClick={() => handleNavigate('/admin')}>
+                  <ListItemIcon>
+                    <AdminPanelSettings fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Administração"
+                    primaryTypographyProps={{
+                      fontFamily: 'Montserrat',
+                      fontSize: '0.95rem'
+                    }}
+                  />
+                </MenuItem>
+              )}
+
+              {state.user.role === Role.Funcionario && (
+                <MenuItem onClick={() => handleNavigate('/employee')}>
+                  <ListItemIcon>
+                    <BadgeIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary="Área do Funcionário"
+                    primaryTypographyProps={{
+                      fontFamily: 'Montserrat',
+                      fontSize: '0.95rem'
+                    }}
+                  />
+                </MenuItem>
+              )}
+
+              <Divider />
+
+              <MenuItem onClick={handleLogout}>
+                <ListItemIcon>
+                  <ExitToApp fontSize="small" />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Sair"
+                  primaryTypographyProps={{
+                    fontFamily: 'Montserrat',
+                    fontSize: '0.95rem'
+                  }}
+                />
+              </MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<Login />}
+            component={Link}
+            to="/login"
+            sx={{ 
+              fontFamily: 'Montserrat',
+              fontWeight: 500,
+              fontSize: '0.95rem',
+              px: 3,
+              py: 1
+            }}
+          >
+            Entrar
+          </Button>
+        )}
+      </Stack>
+    </Stack>
   );
 };
 

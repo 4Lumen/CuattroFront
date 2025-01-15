@@ -197,3 +197,70 @@ src/
 - Validação de tipos para categorias
 - Cache de categorias para performance
 - Atualização otimista de UI
+
+## UI/UX Design
+
+### Estilo Visual
+- **Cores Principais**:
+  - Amarelo Principal: #FFA500 (do logo)
+  - Branco: #FFFFFF
+  - Preto: #000000
+  - Cinza Claro: #F5F5F5 (background)
+  - Cinza Escuro: #333333 (textos)
+
+### Layout
+- **Header**:
+  - Logo centralizado no topo
+  - Menu de navegação horizontal abaixo do logo
+  - Carrinho de compras no canto superior direito
+  - Barra de busca integrada
+
+### Menu/Cardápio
+- **Categorização**:
+  - Menu lateral fixo com categorias
+  - Grid de produtos com 3 colunas
+  - Cards de produtos com imagem, título e preço
+  - Botão de "Visualização Rápida" no hover
+
+### Cards de Produtos
+- **Estrutura**:
+  - Imagem do produto em destaque
+  - Título em fonte elegante
+  - Preço em destaque
+  - Categoria em texto discreto
+  - Botão de adicionar ao carrinho
+  - Efeito de hover suave
+
+### Tipografia
+- **Fontes**:
+  - Títulos: Playfair Display
+  - Corpo: Roboto
+  - Preços: Montserrat
+  - Categorias: Roboto Condensed
+
+### Elementos Interativos
+- **Botões**:
+  - Primário: Amarelo sólido (#FFA500)
+  - Secundário: Transparente com borda
+  - Hover: Escurecimento suave
+  - Ripple effect no clique
+
+### Responsividade
+- **Breakpoints**:
+  - Mobile: < 768px (1 coluna)
+  - Tablet: 768px - 1024px (2 colunas)
+  - Desktop: > 1024px (3 colunas)
+
+### Animações
+- **Transições**:
+  - Menu dropdown suave
+  - Fade in de imagens
+  - Hover com scale suave
+  - Loading states animados
+
+### Elementos Especiais
+- **Features**:
+  - Modal de visualização rápida
+  - Filtros de categoria com animação
+  - Carrinho lateral deslizante
+  - Notificações toast animadas
