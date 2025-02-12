@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper, 
-  IconButton, 
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
   Box,
   Button,
   Dialog,
@@ -21,19 +21,47 @@ import {
   FormControlLabel,
   Radio,
   Snackbar,
-  Alert
+  Alert,
+  TextField
 } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useCart } from '../hooks/useCart';
 import PedidoService from '../services/pedidoService';
+import AuthService from '../services/authService';
 
 const CartPage: React.FC = () => {
   const { items, total, addToCart, decrementFromCart, clearCart } = useCart();
+  const [user, setUser] = useState<any>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [formaPagamento, setFormaPagamento] = useState<string>('Dinheiro');
+  const [enderecoEntrega, setEnderecoEntrega] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const currentUser = await AuthService.getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error("Erro ao obter usuário:", error);
+        setError("Erro ao obter informações do usuário. Por favor, tente novamente.");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  if (!user) {
+    return (
+      <Container>
+        <Typography variant="h5" align="center" sx={{ mt: 4 }}>
+          Por favor, faça login para continuar
+        </Typography>
+      </Container>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -47,6 +75,10 @@ const CartPage: React.FC = () => {
 
   const handleFinalizarPedido = async () => {
     try {
+      if (!enderecoEntrega.trim()) {
+        throw new Error('Por favor, informe o endereço de entrega');
+      }
+
       setLoading(true);
       setError(null);
       console.log('Iniciando finalização do pedido...');
@@ -55,7 +87,7 @@ const CartPage: React.FC = () => {
         throw new Error('O carrinho está vazio');
       }
 
-      await PedidoService.createPedido(items, formaPagamento);
+      await PedidoService.createPedido(items, formaPagamento, enderecoEntrega);
       console.log('Pedido criado com sucesso');
       clearCart();
       setSuccess(true);
@@ -165,9 +197,25 @@ const CartPage: React.FC = () => {
       </Box>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Forma de Pagamento</DialogTitle>
+        <DialogTitle>Finalizar Pedido</DialogTitle>
         <DialogContent>
+          <Box sx={{ mb: 3, mt: 1 }}>
+            <TextField
+              fullWidth
+              label="Endereço de Entrega"
+              value={enderecoEntrega}
+              onChange={(e) => setEnderecoEntrega(e.target.value)}
+              multiline
+              rows={2}
+              required
+              error={!enderecoEntrega.trim()}
+              helperText={!enderecoEntrega.trim() ? 'Endereço é obrigatório' : ''}
+            />
+          </Box>
           <FormControl component="fieldset">
+            <Typography variant="subtitle1" gutterBottom>
+              Forma de Pagamento
+            </Typography>
             <RadioGroup
               value={formaPagamento}
               onChange={(e) => setFormaPagamento(e.target.value)}
@@ -182,8 +230,12 @@ const CartPage: React.FC = () => {
           <Button onClick={() => setOpenDialog(false)} color="inherit">
             Cancelar
           </Button>
-          <Button onClick={handleFinalizarPedido} color="primary" disabled={loading}>
-            Confirmar
+          <Button 
+            onClick={handleFinalizarPedido} 
+            color="primary" 
+            disabled={loading || !enderecoEntrega.trim()}
+          >
+            {loading ? 'Processando...' : 'Confirmar'}
           </Button>
         </DialogActions>
       </Dialog>

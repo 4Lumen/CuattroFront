@@ -51,7 +51,7 @@ const mapFormaPagamento = (formaPagamentoStr: string): FormaPagamento => {
 };
 
 const PedidoService = {
-  async createPedido(items: CartItem[], formaPagamentoStr: string): Promise<void> {
+  async createPedido(items: CartItem[], formaPagamentoStr: string, enderecoEntrega: string): Promise<void> {
     try {
       console.log('Iniciando criação do pedido...');
       
@@ -68,9 +68,10 @@ const PedidoService = {
 
       const valorTotal = items.reduce((total, { item, quantity }) => total + (item.preco * quantity), 0);
 
+      // O usuário ID será obtido do token JWT pelo backend
       const pedido: Pedido = {
-        usuarioId: 1, // TODO: Pegar o ID do usuário logado
-        enderecoEntrega: 'Local',
+        usuarioId: 0, // O backend vai pegar do token
+        enderecoEntrega,
         formaPagamento,
         status: StatusPedido.Pendente,
         itens: itensPedido,
