@@ -46,23 +46,23 @@ const AdminPage: React.FC = () => {
     try {
       // Primeiro carrega todas as categorias
       const categorias = await categoriaService.getCategorias();
-      console.log('Categorias carregadas:', categorias.map(c => ({
-        id: c.id,
-        tipo: typeof c.id,
-        nome: c.nome
-      })));
+      //console.log('Categorias carregadas:', categorias.map(c => ({
+      //  id: c.id,
+      //  tipo: typeof c.id,
+      //  nome: c.nome
+      //})));
 
       // Depois carrega os itens
       const loadedItems = await itemService.getItems();
-      console.log('Itens carregados:', loadedItems.map(item => ({
-        nome: item.nome,
-        categoriaId: item.categoriaId,
-        tipoCategoriaId: typeof item.categoriaId
-      })));
+      //console.log('Itens carregados:', loadedItems.map(item => ({
+      //  nome: item.nome,
+      //  categoriaId: item.categoriaId,
+      //  tipoCategoriaId: typeof item.categoriaId
+      //})));
       
       // Associa as categorias corretas aos itens
       const itemsWithCategories = loadedItems.map(item => {
-        console.log('\n=== Processando item:', item.nome, '===');
+        //console.log('\n=== Processando item:', item.nome, '===');
         
         // Primeiro tenta pelo categoriaId
         if (item.categoriaId !== undefined && item.categoriaId !== null) {
@@ -138,21 +138,21 @@ const AdminPage: React.FC = () => {
 
   const getCategoriaDisplay = (categoria: string | Categoria | undefined): string => {
     if (!categoria) {
-      console.log('Categoria undefined, retornando "Sem Categoria"');
+      //console.log('Categoria undefined, retornando "Sem Categoria"');
       return 'Sem Categoria';
     }
     
     if (typeof categoria === 'string') {
-      console.log('Categoria é string:', categoria);
+      //console.log('Categoria é string:', categoria);
       return categoria;
     }
     
     if ('nome' in categoria) {
-      console.log('Categoria é objeto com nome:', categoria.nome);
+      //console.log('Categoria é objeto com nome:', categoria.nome);
       return categoria.nome;
     }
     
-    console.log('Categoria inválida:', categoria);
+    //console.log('Categoria inválida:', categoria);
     return 'Sem Categoria';
   };
 

@@ -42,7 +42,7 @@ const ItemList: React.FC = () => {
       
       // Associa as categorias corretas aos itens
       const menuItems = fetchedItems.map(item => {
-        console.log('Processando item:', item.nome, 'com categoria:', item.categoria, 'e categoriaId:', item.categoriaId);
+        //console.log('Processando item:', item.nome, 'com categoria:', item.categoria, 'e categoriaId:', item.categoriaId);
         
         // Primeiro tenta pelo categoriaId
         if (item.categoriaId) {

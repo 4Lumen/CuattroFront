@@ -1,10 +1,21 @@
-export interface User {
-  id: string;
-  nome: string;
-  email: string;
-  role: string;
+export interface Usuario {
+  id: number;
   auth0Id?: string;
-  picture?: string;
+  nome?: string;
+  email?: string;
+  role: Role;
+}
+
+export interface CreateUsuarioDto {
+  auth0Id?: string;
+  nome?: string;
+  email?: string;
+}
+
+export enum Role {
+  Cliente = 0,
+  Funcionario = 1,
+  Administrador = 2
 }
 
 export interface Categoria {
@@ -27,21 +38,26 @@ export interface Item {
 
 export interface ItemCarrinho {
   id: number;
-  quantidade: number;
-  item: Item;
   carrinhoId: number;
+  carrinho?: Carrinho;
+  itemId: number;
+  item?: Item;
+  quantidade: number;
 }
 
 export interface Carrinho {
   id: number;
-  usuarioId: string;
+  usuarioId: number;
+  usuario?: Usuario;
   dataCriacao: string;
-  status: CarrinhoStatus;
-  itensCarrinho: ItemCarrinho[];
+  dataEntrega?: string;
+  localEntrega?: string;
+  status: Status;
+  itensCarrinho?: ItemCarrinho[];
 }
 
 export interface AppState {
-  user: User | null;
+  user: Usuario | null;
   cart: Carrinho | null;
   items: Item[];
   loading: boolean;
@@ -49,7 +65,7 @@ export interface AppState {
 }
 
 export type AppAction =
-  | { type: 'SET_USER'; payload: User | null }
+  | { type: 'SET_USER'; payload: Usuario | null }
   | { type: 'SET_CART'; payload: Carrinho | null }
   | { type: 'SET_ITEMS'; payload: Item[] }
   | { type: 'ADD_TO_CART'; payload: ItemCarrinho }
@@ -92,4 +108,11 @@ export interface Auth0User {
 
 export type ItemStatus = 0 | 1 | 2; // 0: Ativo, 1: Inativo, 2: Esgotado
 
-export type CarrinhoStatus = 0 | 1 | 2 | 3; // 0: Aberto, 1: Fechado, 2: Cancelado, 3: Finalizado 
+export enum Status {
+  EmAberto = 0,
+  EmProcessamento = 1,
+  Finalizado = 2,
+  Cancelado = 3
+}
+
+export type CarrinhoStatus = 0 | 1 | 2 | 3; // 0: Aberto, 1: Fechado, 2: Cancelado, 3: Finalizado

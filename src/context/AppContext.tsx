@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { AppState, AppAction } from '../types';
+import UserService from '../services/UserService';
 import AuthService from '../services/authService';
 
 const initialState: AppState = {
@@ -116,6 +117,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (isSubscribed) {
           if (user) {
             console.log('Usuário autenticado:', user);
+            // Verifica se o usuário existe no backend, se não existir, cria
+            try {
+              if (user.auth0Id) {
+                try {
+                  // Tenta obter o usuário do backend primeiro
+                  await UserService.getCurrentUser();
+                  console.log('Usuário já existe no backend');
+                } catch (error) {
+                  // Se der erro 404 ou qualquer outro erro, tenta criar o usuário
+                  console.log('Usuário não encontrado no backend, criando...');
+                  await UserService.createUser({
+                    auth0Id: user.auth0Id,
+                    nome: user.nome ?? '',
+                    email: user.email ?? ''
+                  });
+                  console.log('Usuário criado no backend com sucesso');
+                }
+              }
+            } catch (error) {
+              console.error('Erro ao verificar/criar usuário no backend:', error);
+            }
             dispatch({ type: 'SET_USER', payload: user });
           } else {
             console.log('Nenhum usuário autenticado');

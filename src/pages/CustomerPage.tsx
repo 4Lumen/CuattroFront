@@ -70,13 +70,13 @@ const CustomerPage: React.FC = () => {
         
         // Associa as categorias corretas aos itens
         const itemsWithCategories = fetchedItems.map(item => {
-          console.log('Processando item:', item.nome, 'com categoria:', item.categoria, 'e categoriaId:', item.categoriaId);
+          //console.log('Processando item:', item.nome, 'com categoria:', item.categoria, 'e categoriaId:', item.categoriaId);
           
           // Primeiro tenta pelo categoriaId
           if (item.categoriaId) {
             const categoria = categorias.find(c => c.id === item.categoriaId);
             if (categoria) {
-              console.log(`Categoria encontrada por ID ${item.categoriaId} para o item ${item.nome}:`, categoria);
+              //console.log(`Categoria encontrada por ID ${item.categoriaId} para o item ${item.nome}:`, categoria);
               return { ...item, categoria };
             }
           }
@@ -86,7 +86,7 @@ const CustomerPage: React.FC = () => {
             const categoriaId = item.categoria.id;
             const categoria = categorias.find(c => c.id === categoriaId);
             if (categoria) {
-              console.log(`Categoria encontrada por ID para o item ${item.nome}:`, categoria);
+              //console.log(`Categoria encontrada por ID para o item ${item.nome}:`, categoria);
               return { ...item, categoria };
             }
           }
@@ -98,7 +98,7 @@ const CustomerPage: React.FC = () => {
               c.nome && c.nome.toLowerCase() === categoriaNome.toLowerCase()
             );
             if (categoria) {
-              console.log(`Categoria encontrada por nome para o item ${item.nome}:`, categoria);
+              //console.log(`Categoria encontrada por nome para o item ${item.nome}:`, categoria);
               return { ...item, categoria };
             }
           }
@@ -111,7 +111,7 @@ const CustomerPage: React.FC = () => {
             ordem: 0, 
             ativa: true 
           };
-          console.log(`Usando categoria padrão para o item ${item.nome}:`, categoriaDefault);
+          //console.log(`Usando categoria padrão para o item ${item.nome}:`, categoriaDefault);
           return { ...item, categoria: categoriaDefault };
         });
         
@@ -127,7 +127,7 @@ const CustomerPage: React.FC = () => {
           return catA.localeCompare(catB);
         });
         
-        console.log('Itens com categorias processados:', itemsOrdenados);
+        //console.log('Itens com categorias processados:', itemsOrdenados);
         setItems(itemsOrdenados);
         setError(null);
       } catch (error) {
@@ -178,7 +178,7 @@ const CustomerPage: React.FC = () => {
     }
     
     if ('nome' in categoria && categoria.nome) {
-      console.log('Categoria é objeto com nome:', categoria.nome);
+      //console.log('Categoria é objeto com nome:', categoria.nome);
       return categoria.nome;
     }
     

@@ -1,5 +1,5 @@
 import api from './api';
-import { ItemCarrinho } from '../types';
+import { ItemCarrinho } from '../types/index';
 
 const ItemCarrinhoService = {
   async addItemToCart(itemCarrinho: Omit<ItemCarrinho, 'id'>): Promise<ItemCarrinho> {
@@ -7,13 +7,12 @@ const ItemCarrinhoService = {
     return response.data;
   },
 
-  async updateCartItem(id: number, itemCarrinho: Partial<ItemCarrinho>): Promise<ItemCarrinho> {
-    const response = await api.put<ItemCarrinho>(`/ItemCarrinho/${id}`, itemCarrinho);
-    return response.data;
+  async updateItemQuantity(id: number, quantidade: number): Promise<void> {
+    await api.put(`/ItemCarrinho/${id}`, { quantidade });
   },
 
-  async removeItemFromCart(carrinhoId: number, itemId: number): Promise<void> {
-    await api.delete(`/ItemCarrinho/${carrinhoId}/${itemId}`);
+  async removeItem(id: number): Promise<void> {
+    await api.delete(`/ItemCarrinho/${id}`);
   }
 };
 
