@@ -20,13 +20,25 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle
+  DialogTitle,
+  Autocomplete
 } from '@mui/material';
 import itemService, { Item } from '../services/itemService';
 import categoriaService, { Categoria } from '../services/categoriaService';
 import ImageNotSupportedIcon from '@mui/icons-material/ImageNotSupported';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+
+const commonUnits = [
+  'kg',
+  'g',
+  'ml',
+  'l',
+  'unidade',
+  'pacote',
+  'caixa',
+  'dúzia'
+];
 
 const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -44,75 +56,41 @@ const AdminPage: React.FC = () => {
 
   const loadItems = async () => {
     try {
-      // Primeiro carrega todas as categorias
       const categorias = await categoriaService.getCategorias();
-      //console.log('Categorias carregadas:', categorias.map(c => ({
-      //  id: c.id,
-      //  tipo: typeof c.id,
-      //  nome: c.nome
-      //})));
-
-      // Depois carrega os itens
       const loadedItems = await itemService.getItems();
-      //console.log('Itens carregados:', loadedItems.map(item => ({
-      //  nome: item.nome,
-      //  categoriaId: item.categoriaId,
-      //  tipoCategoriaId: typeof item.categoriaId
-      //})));
       
-      // Associa as categorias corretas aos itens
       const itemsWithCategories = loadedItems.map(item => {
-        //console.log('\n=== Processando item:', item.nome, '===');
-        
-        // Primeiro tenta pelo categoriaId
         if (item.categoriaId !== undefined && item.categoriaId !== null) {
-          console.log('Tentando encontrar categoria com ID:', item.categoriaId);
           const itemCategoriaId = Number(item.categoriaId);
           const categoria = categorias.find(c => {
             const categoriaId = Number(c.id);
             const match = categoriaId === itemCategoriaId;
-            console.log(`Comparando com categoria "${c.nome}":`, {
-              categoriaId,
-              itemCategoriaId,
-              match
-            });
             return match;
           });
 
           if (categoria) {
-            console.log('✅ Categoria encontrada:', categoria.nome);
             return { ...item, categoria };
-          } else {
-            console.log('❌ Nenhuma categoria encontrada com ID:', item.categoriaId);
           }
         }
         
-        // Se não achou por ID, tenta pelo objeto categoria
         if (item.categoria && typeof item.categoria === 'object' && 'id' in item.categoria) {
           const categoriaId = Number(item.categoria.id);
-          console.log('Tentando encontrar categoria pelo objeto.id:', categoriaId);
           const categoria = categorias.find(c => Number(c.id) === categoriaId);
           if (categoria) {
-            console.log('✅ Categoria encontrada pelo objeto:', categoria.nome);
             return { ...item, categoria };
           }
         }
         
-        // Se não achou por ID, tenta pelo nome
         if (item.categoria && typeof item.categoria === 'string') {
           const categoriaNome = item.categoria;
-          console.log('Tentando encontrar categoria pelo nome:', categoriaNome);
           const categoria = categorias.find(c => 
             c.nome && c.nome.toLowerCase() === categoriaNome.toLowerCase()
           );
           if (categoria) {
-            console.log('✅ Categoria encontrada pelo nome:', categoria.nome);
             return { ...item, categoria };
           }
         }
         
-        // Se não encontrou categoria válida
-        console.log('❌ Nenhuma categoria válida encontrada, usando padrão');
         const categoriaDefault = { 
           id: 0, 
           nome: 'Sem Categoria', 
@@ -122,12 +100,6 @@ const AdminPage: React.FC = () => {
         };
         return { ...item, categoria: categoriaDefault };
       });
-
-      console.log('\nItens processados:', itemsWithCategories.map(item => ({
-        nome: item.nome,
-        categoriaId: item.categoriaId,
-        categoriaNome: item.categoria?.nome
-      })));
       
       setItems(itemsWithCategories);
     } catch (error) {
@@ -138,21 +110,17 @@ const AdminPage: React.FC = () => {
 
   const getCategoriaDisplay = (categoria: string | Categoria | undefined): string => {
     if (!categoria) {
-      //console.log('Categoria undefined, retornando "Sem Categoria"');
       return 'Sem Categoria';
     }
     
     if (typeof categoria === 'string') {
-      //console.log('Categoria é string:', categoria);
       return categoria;
     }
     
     if ('nome' in categoria) {
-      //console.log('Categoria é objeto com nome:', categoria.nome);
       return categoria.nome;
     }
     
-    //console.log('Categoria inválida:', categoria);
     return 'Sem Categoria';
   };
 
@@ -163,36 +131,27 @@ const AdminPage: React.FC = () => {
       return;
     }
 
-    console.log('Item para edição:', item);
-    console.log('Categoria do item:', item.categoria);
-
-    // Garante que o item tenha uma categoria válida
     let categoriaNome: string;
     if (item.categoria && typeof item.categoria === 'object' && 'nome' in item.categoria) {
-      console.log('Usando nome da categoria do objeto:', item.categoria.nome);
       categoriaNome = item.categoria.nome;
     } else if (item.categoria && typeof item.categoria === 'string') {
-      console.log('Usando categoria string:', item.categoria);
       categoriaNome = item.categoria;
     } else {
-      console.log('Usando categoria padrão');
       categoriaNome = 'Sem Categoria';
     }
 
-    console.log('Nome da categoria extraído:', categoriaNome);
-
-    // Mantém o objeto categoria completo no editingItem
     setEditingItem({
       ...item,
-      categoria: item.categoria // Mantém o objeto categoria original
+      categoria: item.categoria
     });
 
-    // Define o nome da categoria no formData
     setFormData({
       nome: item.nome || '',
       descricao: item.descricao || '',
       preco: item.preco?.toString() || '',
       categoria: categoriaNome,
+      unidadeMedida: item.unidadeMedida || '',
+      quantidade: item.quantidade?.toString() || '0',
       imagem: null
     });
 
@@ -207,6 +166,8 @@ const AdminPage: React.FC = () => {
       descricao: '',
       preco: '',
       categoria: '',
+      unidadeMedida: '',
+      quantidade: '0',
       imagem: null
     });
     setSelectedFileName('');
@@ -218,12 +179,16 @@ const AdminPage: React.FC = () => {
     descricao: string;
     preco: string;
     categoria: string;
+    unidadeMedida: string;
+    quantidade: string;
     imagem: File | null;
   }>({
     nome: '',
     descricao: '',
     preco: '',
     categoria: '',
+    unidadeMedida: '',
+    quantidade: '0',
     imagem: null
   });
 
@@ -253,86 +218,70 @@ const AdminPage: React.FC = () => {
     setSuccess(false);
 
     try {
-      // Primeiro cria/obtém a categoria
       const categoria = await itemService.getOrCreateCategoria(formData.categoria);
-      console.log('Categoria obtida/criada:', categoria);
 
       const itemData = {
         nome: formData.nome,
         descricao: formData.descricao,
         preco: Number(formData.preco),
-        categoria: categoria, // Usa o objeto categoria completo
+        unidadeMedida: formData.unidadeMedida,
+        quantidade: Number(formData.quantidade),
+        categoria: categoria,
         imagemUrl: editingItem?.imagemUrl || ''
       };
 
       let createdOrUpdatedItem: Item;
 
-      // Se tem imagem nova, faz o upload primeiro
       if (formData.imagem) {
-        // Se está editando, usa o ID existente, senão cria o item primeiro
         if (editingItem) {
-          console.log('Iniciando upload da imagem para item existente...', {
-            itemId: editingItem.id,
-            fileName: formData.imagem.name,
-            fileSize: formData.imagem.size,
-            fileType: formData.imagem.type
-          });
-
           const imageUrl = await itemService.uploadImage(editingItem.id, formData.imagem);
-          console.log('Imagem enviada:', imageUrl);
           
-          // Atualiza o item com todos os dados novos incluindo a imagem e categoria
           createdOrUpdatedItem = await itemService.updateItem({
             ...editingItem,
             ...itemData,
-            categoria: categoria, // Garante que a categoria está correta
+            categoria: categoria,
             imagemUrl: imageUrl
           });
         } else {
-          // Cria o item primeiro com a categoria correta
           createdOrUpdatedItem = await itemService.createItem({
             ...itemData,
-            categoria: categoria // Garante que a categoria está correta
-          });
-          console.log('Item criado:', createdOrUpdatedItem);
-
-          // Faz upload da imagem
-          console.log('Iniciando upload da imagem para novo item...', {
-            itemId: createdOrUpdatedItem.id,
-            fileName: formData.imagem.name,
-            fileSize: formData.imagem.size,
-            fileType: formData.imagem.type
+            categoria: categoria,
+            disponivel: true,
+            destaque: false,
+            ordem: 0,
+            tags: []
           });
 
           const imageUrl = await itemService.uploadImage(createdOrUpdatedItem.id, formData.imagem);
-          console.log('Imagem enviada:', imageUrl);
 
-          // Atualiza o item com a URL da imagem mantendo a categoria
           createdOrUpdatedItem = await itemService.updateItem({
             ...createdOrUpdatedItem,
-            categoria: categoria, // Garante que a categoria está correta
+            categoria: categoria,
             imagemUrl: imageUrl
           });
         }
       } else {
-        // Se não tem imagem nova, apenas cria/atualiza o item normalmente
         if (editingItem) {
           createdOrUpdatedItem = await itemService.updateItem({
             ...editingItem,
             ...itemData,
-            categoria: categoria // Garante que a categoria está correta
+            categoria: categoria
           });
         } else {
           createdOrUpdatedItem = await itemService.createItem({
             ...itemData,
-            categoria: categoria // Garante que a categoria está correta
+            categoria: categoria,
+            disponivel: true,
+            destaque: false,
+            ordem: 0,
+            tags: []
           });
         }
       }
 
       setSuccess(true);
-      handleCancel(); // Limpa o formulário
-      await loadItems(); // Recarrega a lista
+      handleCancel();
+      await loadItems();
     } catch (error) {
       console.error('Erro ao salvar item:', error);
       if (error instanceof Error) {
@@ -447,6 +396,45 @@ const AdminPage: React.FC = () => {
               )}
             </Box>
 
+            <Autocomplete
+              freeSolo
+              fullWidth
+              options={commonUnits}
+              value={formData.unidadeMedida}
+              onChange={(event, newValue) => {
+                setFormData(prev => ({
+                  ...prev,
+                  unidadeMedida: newValue || ''
+                }));
+              }}
+              onInputChange={(event, newInputValue) => {
+                setFormData(prev => ({
+                  ...prev,
+                  unidadeMedida: newInputValue
+                }));
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  name="unidadeMedida"
+                  label="Unidade de Medida"
+                  required
+                  fullWidth
+                />
+              )}
+            />
+
+            <TextField
+              label="Quantidade"
+              name="quantidade"
+              type="number"
+              value={formData.quantidade}
+              onChange={handleInputChange}
+              required
+              fullWidth
+              inputProps={{ min: 0 }}
+            />
+
             <TextField
               label="Descrição"
               name="descricao"
@@ -515,6 +503,8 @@ const AdminPage: React.FC = () => {
                 <TableCell>Nome</TableCell>
                 <TableCell>Categoria</TableCell>
                 <TableCell>Preço</TableCell>
+                <TableCell>Un. Medida</TableCell>
+                <TableCell>Qtd.</TableCell>
                 <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
@@ -551,6 +541,8 @@ const AdminPage: React.FC = () => {
                       currency: 'BRL'
                     }).format(item.preco)}
                   </TableCell>
+                  <TableCell>{item.unidadeMedida}</TableCell>
+                  <TableCell>{item.quantidade}</TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 1 }}>
                       <IconButton

@@ -7,9 +7,15 @@ export interface CreateItemDTO {
   nome: string;
   descricao: string;
   preco: number;
+  unidadeMedida: string;
+  quantidade: number;
   categoria: string | Categoria;
   categoriaId?: number;
   imagemUrl?: string;
+  disponivel: boolean;
+  destaque: boolean;
+  ordem: number;
+  tags: string[];
   itensCarrinho?: ItemCarrinho[];
 }
 
@@ -102,9 +108,15 @@ const ItemService = {
         nome: item.nome.trim(),
         descricao: (item.descricao || '').trim(),
         preco: Number(item.preco),
+        unidadeMedida: item.unidadeMedida,
+        quantidade: item.quantidade,
         categoriaId: categoria.id,
-        categoria: categoria, // Inclui o objeto categoria completo
+        categoria: categoria,
         imagemUrl: (item.imagemUrl || '').trim(),
+        disponivel: item.disponivel,
+        destaque: item.destaque,
+        ordem: item.ordem,
+        tags: item.tags,
         itensCarrinho: []
       };
 
@@ -246,10 +258,16 @@ const ItemService = {
       nome: item.nome,
       descricao: item.descricao,
       preco: item.preco,
+      unidadeMedida: item.unidadeMedida,
+      quantidade: item.quantidade,
       imagemUrl: item.imagemUrl,
       categoriaId: categoria.id,
-      categoria: categoria, // Envia o objeto categoria completo
-      itensCarrinho: [] // Campo obrigatório para o backend
+      categoria: categoria,
+      disponivel: item.disponivel,
+      destaque: item.destaque,
+      ordem: item.ordem,
+      tags: item.tags,
+      itensCarrinho: []
     };
 
     try {

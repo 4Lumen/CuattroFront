@@ -11,7 +11,8 @@ import {
   TableRow,
   Paper,
   CircularProgress,
-  Alert
+  Alert,
+  Chip
 } from '@mui/material';
 import ItemService from '../../services/itemService';
 import { MenuItem, CreateMenuItem } from './MenuConfiguration';
@@ -49,7 +50,16 @@ const ItemList: React.FC = () => {
           const categoria = categorias.find(c => c.id === item.categoriaId);
           if (categoria) {
             console.log(`Categoria encontrada por ID ${item.categoriaId} para o item ${item.nome}:`, categoria);
-            return { ...item, categoria: categoria.nome };
+            return {
+              ...item,
+              categoria: categoria.nome,
+              unidadeMedida: item.unidadeMedida || '',
+              quantidade: item.quantidade || 0,
+              disponivel: item.disponivel ?? true,
+              destaque: item.destaque ?? false,
+              ordem: item.ordem ?? 0,
+              tags: item.tags || []
+            };
           }
         }
         
@@ -59,7 +69,16 @@ const ItemList: React.FC = () => {
           const categoria = categorias.find(c => c.id === categoriaId);
           if (categoria) {
             console.log(`Categoria encontrada por ID para o item ${item.nome}:`, categoria);
-            return { ...item, categoria: categoria.nome };
+            return {
+              ...item,
+              categoria: categoria.nome,
+              unidadeMedida: item.unidadeMedida || '',
+              quantidade: item.quantidade || 0,
+              disponivel: item.disponivel ?? true,
+              destaque: item.destaque ?? false,
+              ordem: item.ordem ?? 0,
+              tags: item.tags || []
+            };
           }
         }
         
@@ -190,7 +209,10 @@ const ItemList: React.FC = () => {
               <TableCell>Nome</TableCell>
               <TableCell>Descrição</TableCell>
               <TableCell>Preço</TableCell>
+              <TableCell>Un. Medida</TableCell>
+              <TableCell>Qtd.</TableCell>
               <TableCell>Categoria</TableCell>
+              <TableCell>Status</TableCell>
               <TableCell align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
@@ -200,7 +222,24 @@ const ItemList: React.FC = () => {
                 <TableCell>{item.nome}</TableCell>
                 <TableCell>{item.descricao}</TableCell>
                 <TableCell>R$ {item.preco.toFixed(2)}</TableCell>
+                <TableCell>{item.unidadeMedida}</TableCell>
+                <TableCell align="center">{item.quantidade}</TableCell>
                 <TableCell>{getCategoriaDisplay(item.categoria)}</TableCell>
+                <TableCell>
+                  {item.disponivel ? (
+                    <Chip label="Disponível" color="success" size="small" />
+                  ) : (
+                    <Chip label="Indisponível" color="error" size="small" />
+                  )}
+                  {item.destaque && (
+                    <Chip
+                      label="Destaque"
+                      color="primary"
+                      size="small"
+                      sx={{ ml: 1 }}
+                    />
+                  )}
+                </TableCell>
                 <TableCell align="right">
                   <Button
                     color="primary"

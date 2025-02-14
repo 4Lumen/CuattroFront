@@ -7,8 +7,14 @@ export interface CreateMenuItem {
   nome: string;
   descricao: string;
   preco: number;
+  unidadeMedida: string;
+  quantidade: number;
   categoria: string | Categoria;
   imagemUrl?: string;
+  disponivel: boolean;
+  destaque: boolean;
+  ordem: number;
+  tags: string[];
   categoriaId?: number;
 }
 

@@ -31,8 +31,15 @@ export interface Item {
   nome: string;
   descricao: string;
   preco: number;
+  unidadeMedida: string;
+  quantidade: number;
   categoria: Categoria | { id: number; nome: string } | string;
   imagemUrl: string;
+  disponivel: boolean;
+  destaque: boolean;
+  ordem: number;
+  tags: string[];
+  categoriaId: number;
   itensCarrinho?: ItemCarrinho[];
 }
 

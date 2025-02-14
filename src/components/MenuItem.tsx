@@ -138,10 +138,23 @@ const MenuItem: React.FC<MenuItemProps> = ({
             sx={{
               fontFamily: '"Roboto", sans-serif',
               fontSize: '0.875rem',
-              mb: 2
+              mb: 1
             }}
           >
             {item.descricao}
+          </Typography>
+
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{
+              fontFamily: '"Roboto", sans-serif',
+              fontSize: '0.875rem',
+              mb: 1,
+              fontStyle: 'italic'
+            }}
+          >
+            {item.quantidade} {item.unidadeMedida}
           </Typography>
 
           <Typography 
@@ -221,4 +234,4 @@ const MenuItem: React.FC<MenuItemProps> = ({
   );
 };
 
-export default MenuItem; 
+export default MenuItem;
