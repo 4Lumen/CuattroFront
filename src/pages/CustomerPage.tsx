@@ -453,29 +453,15 @@ const CustomerPage: React.FC = () => {
       </Box>
 
         {isTableView ? (
-          filteredCategorias.map(([categoriaKey, categoriaItems]) => (
-            <Box key={categoriaKey} sx={{ mb: 6 }}>
-              <Typography
-                variant="h4"
-                component="h2"
-                gutterBottom
-                sx={{
-                  mb: 4,
-                  fontFamily: '"Playfair Display", serif',
-                  fontWeight: 600
-                }}
-              >
-                {getCategoriaDisplay(categoriaItems[0]?.categoria)}
-              </Typography>
-              <ItemTable
-                items={categoriaItems}
-                onAdd={handleAddToCart}
-                onRemove={handleRemoveFromCart}
-                onQuickView={handleQuickView}
-                getItemQuantity={getItemQuantityInCart}
-              />
-            </Box>
-          ))
+          <Box sx={{ mb: 6 }}>
+            <ItemTable
+              items={filteredCategorias.flatMap(([_, items]) => items)}
+              onAdd={handleAddToCart}
+              onRemove={handleRemoveFromCart}
+              onQuickView={handleQuickView}
+              getItemQuantity={getItemQuantityInCart}
+            />
+          </Box>
         ) : (
           filteredCategorias.map(([categoriaKey, categoriaItems]) => (
             <Box key={categoriaKey} sx={{ mb: 6 }}>
