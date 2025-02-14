@@ -44,18 +44,24 @@ export class OpenAiService {
       console.log('Getting menu suggestions for input:', userInput);
       console.log('Available items count:', availableItems.length);
 
-      const systemMessage = `You are a menu assistant for a buffet service. Your task is to suggest menu items for customers based on their needs and the available quantities. Each item listing includes its measurement unit (L, ml, g, unidade, M) which you should consider when suggesting quantities.
+      const systemMessage = `You are a menu assistant for a buffet service. Your task is to suggest menu items for customers based on their needs. Each item has a base quantity (for example, 1 unit of juice might be 500ml, 1 unit of ham might be 500g). You should suggest the number of units needed, not the total volume/weight.
 
 When responding, only provide a JSON object with the following structure:
 {
   "items": [
-    {"itemId": number, "quantity": number (in the item's unit of measurement), "reasoning": "string explaining why this quantity"}
+    {"itemId": number, "quantity": number (in units, NOT in total volume/weight), "reasoning": "string explaining why this many units"}
   ],
   "totalEstimate": number (total cost),
   "dietaryNotes": ["relevant dietary notes"]
 }
 
-Make sure to respect each item's unit of measurement when suggesting quantities.
+IMPORTANT: Each item comes in predefined quantities. For example:
+- If an item shows "500 ml" and you need 1000ml, suggest quantity: 2 (units)
+- If an item shows "500 g" and you need 1500g, suggest quantity: 3 (units)
+- If an item shows "1 unidade", suggest the direct number of units needed
+- If an item shows "1 M" (metro), suggest the number of meters needed
+
+Make sure to suggest quantities in UNITS based on each item's base measurement.
 Available menu items: ${this.formatItemsForPrompt(availableItems)}`;
 
       const payload = {
