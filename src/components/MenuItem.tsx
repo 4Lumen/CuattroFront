@@ -132,17 +132,19 @@ const MenuItem: React.FC<MenuItemProps> = ({
             {item.nome}
           </Typography>
 
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{
-              fontFamily: '"Roboto", sans-serif',
-              fontSize: '0.875rem',
-              mb: 1
-            }}
-          >
-            {item.descricao}
-          </Typography>
+          {item.descricao && (
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{
+                fontFamily: '"Roboto", sans-serif',
+                fontSize: '0.875rem',
+                mb: 1
+              }}
+            >
+              {item.descricao}
+            </Typography>
+          )}
 
           <Typography 
             variant="body2" 

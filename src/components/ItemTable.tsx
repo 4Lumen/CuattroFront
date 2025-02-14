@@ -43,6 +43,7 @@ const ItemTable: React.FC<ItemTableProps> = ({
             <TableCell>Item</TableCell>
             <TableCell>Nome</TableCell>
             <TableCell align="right">Preço</TableCell>
+            <TableCell>Un. Medida</TableCell>
             <TableCell align="center">Quantidade</TableCell>
             <TableCell align="center">Ações</TableCell>
           </TableRow>
@@ -93,6 +94,17 @@ const ItemTable: React.FC<ItemTableProps> = ({
                     style: 'currency',
                     currency: 'BRL'
                   }).format(item.preco)}
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography
+                  sx={{
+                    fontFamily: '"Roboto", sans-serif',
+                    fontSize: '0.875rem',
+                    fontStyle: 'italic'
+                  }}
+                >
+                  {item.quantidade} {item.unidadeMedida}
                 </Typography>
               </TableCell>
               <TableCell align="center">
