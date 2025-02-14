@@ -37,6 +37,7 @@ import { Item } from '../services/itemService';
 import ItemService from '../services/itemService';
 import MenuItem from '../components/MenuItem';
 import ItemTable from '../components/ItemTable';
+import AiMenuAssistant from '../components/AiMenuAssistant';
 import categoriaService, { Categoria } from '../services/categoriaService';
 
 const drawerWidth = 240;
@@ -408,14 +409,23 @@ const CustomerPage: React.FC = () => {
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              border: 1,
-              borderColor: 'primary.main',
-              borderRadius: 1
-            }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <AiMenuAssistant
+              items={items}
+              onAddToCart={(item, quantity) => {
+                for (let i = 0; i < quantity; i++) {
+                  handleAddToCart(item);
+                }
+              }}
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                border: 1,
+                borderColor: 'primary.main',
+                borderRadius: 1
+              }}
+            >
             <IconButton
               onClick={() => setIsTableView(false)}
               sx={{
@@ -440,6 +450,7 @@ const CustomerPage: React.FC = () => {
             </IconButton>
           </Box>
         </Box>
+      </Box>
 
         {isTableView ? (
           filteredCategorias.map(([categoriaKey, categoriaItems]) => (

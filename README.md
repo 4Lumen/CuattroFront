@@ -97,12 +97,27 @@ npm start
 
 ## 🔒 Variáveis de Ambiente
 
+Crie um arquivo `.env` baseado no `.env.example` e configure as seguintes variáveis:
+
 ```env
-REACT_APP_API_URL=https://api.cuattro.4lumen.com
-REACT_APP_AUTH0_DOMAIN=seu-dominio.auth0.com
-REACT_APP_AUTH0_CLIENT_ID=seu-client-id
-REACT_APP_AUTH0_AUDIENCE=https://api.cuattro.4lumen.com
+# API Configuration
+REACT_APP_API_URL=https://api.example.com
+
+# Auth0 Configuration
+REACT_APP_AUTH0_DOMAIN=your-auth0-domain.region.auth0.com
+REACT_APP_AUTH0_CLIENT_ID=your-auth0-client-id
+REACT_APP_AUTH0_AUDIENCE=your-auth0-audience
+
+# Role Constants
+REACT_APP_ROLE_ADMIN=2
+REACT_APP_ROLE_EMPLOYEE=1
+REACT_APP_ROLE_CUSTOMER=0
+
+# OpenAI Configuration
+REACT_APP_OPENAI_API_KEY=your-openai-api-key
 ```
+
+**Importante**: Nunca commite o arquivo `.env` com valores reais. Use sempre o `.env.example` como template.
 
 ## 📦 Estrutura de Dados
 
