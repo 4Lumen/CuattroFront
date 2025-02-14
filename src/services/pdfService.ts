@@ -58,7 +58,7 @@ export const generateOrderPDF = (items: CartItem[]): void => {
   // Add table with theme styling
   doc.autoTable({
     startY: 55,
-    head: [['Produto', 'Quantidade', 'Preço Unitário', 'Subtotal']],
+    head: [['Produto', 'QTD', 'Preço Unitário', 'Subtotal']],
     body: tableData,
     foot: [['', '', 'Total:', `R$ ${total.toFixed(2)}`]],
     theme: 'grid',
