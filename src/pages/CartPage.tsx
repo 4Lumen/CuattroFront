@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -13,16 +13,26 @@ import {
   Box,
   Button,
   Snackbar,
-  Alert
+  Alert,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useCart } from '../hooks/useCart';
-import { generateOrderPDF } from '../services/pdfService';
+import { generateOrderPDF, PDFMode } from '../services/pdfService';
 
 const CartPage: React.FC = () => {
   const { items, total, addToCart, decrementFromCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pdfMode, setPdfMode] = useState<PDFMode>(() => {
+    const savedMode = localStorage.getItem('pdfMode');
+    return (savedMode as PDFMode) || 'standard';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pdfMode', pdfMode);
+  }, [pdfMode]);
 
   if (items.length === 0) {
     return (
@@ -34,10 +44,10 @@ const CartPage: React.FC = () => {
     );
   }
 
-  const handleFinalizarPedido = () => {
+  const handleFinalizarPedido = async () => {
     try {
       setLoading(true);
-      generateOrderPDF(items);
+      await generateOrderPDF(items, pdfMode);
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       if (error instanceof Error) {
@@ -134,7 +144,21 @@ const CartPage: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={pdfMode === 'detailed'}
+              onChange={(e) => setPdfMode(e.target.checked ? 'detailed' : 'standard')}
+              color="primary"
+            />
+          }
+          label={
+            <Typography variant="body2" color="textSecondary">
+              {pdfMode === 'detailed' ? 'Modo Detalhado' : 'Modo Padrão'}
+            </Typography>
+          }
+        />
         <Button
           variant="contained"
           color="primary"
