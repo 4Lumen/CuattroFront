@@ -134,9 +134,6 @@ const CartPage: React.FC = () => {
                     )}
                     <Box>
                       <Typography variant="subtitle1">{item.nome}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {item.descricao}
-                      </Typography>
                     </Box>
                   </Box>
                 </TableCell>
@@ -171,12 +168,9 @@ const CartPage: React.FC = () => {
               </TableRow>
             ))}
             <TableRow>
-              <TableCell colSpan={3} align="right">
-                <Typography variant="h6">Total</Typography>
-              </TableCell>
-              <TableCell align="right">
+              <TableCell colSpan={4} align="right">
                 <Typography variant="h6">
-                  R$ {total.toFixed(2)}
+                  Total R$ {total.toFixed(2)}
                 </Typography>
               </TableCell>
             </TableRow>
