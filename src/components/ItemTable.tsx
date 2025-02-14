@@ -140,7 +140,7 @@ const ItemTable: React.FC<ItemTableProps> = ({
         <IconButton 
           size="small" 
           onClick={(e) => handleFilterClick(e, key)}
-          sx={{ ml: 1 }}
+          sx={{ ml: 0 }}
         >
           <FilterListIcon fontSize="small" />
         </IconButton>

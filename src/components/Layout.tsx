@@ -24,7 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           bgcolor: 'background.paper'
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth={false}>
           <Toolbar 
             disableGutters 
             sx={{ 
@@ -53,7 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <Container 
         component="main" 
-        maxWidth="lg" 
+        maxWidth={false}
         sx={{ 
           flex: 1,
           pt: { xs: 2, md: 4 },
