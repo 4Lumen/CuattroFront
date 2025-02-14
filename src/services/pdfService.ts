@@ -42,7 +42,7 @@ export const generateOrderPDF = (items: CartItem[]): void => {
   // Prepare table data
   const tableData = items.map(({ item, quantity }) => [
     item.nome,
-    quantity.toString(),
+    `${item.quantidade * quantity} ${item.unidadeMedida}`,
     `R$ ${item.preco.toFixed(2)}`,
     `R$ ${(item.preco * quantity).toFixed(2)}`
   ]);
@@ -58,7 +58,7 @@ export const generateOrderPDF = (items: CartItem[]): void => {
   // Add table with theme styling
   doc.autoTable({
     startY: 55,
-    head: [['Produto', 'QTD', 'Preço Unitário', 'Subtotal']],
+    head: [['Produto', 'Quantidade', 'Preço Unitário', 'Subtotal']],
     body: tableData,
     foot: [['', '', 'Total:', `R$ ${total.toFixed(2)}`]],
     theme: 'grid',
@@ -85,7 +85,7 @@ export const generateOrderPDF = (items: CartItem[]): void => {
     },
     columnStyles: {
       0: { cellWidth: 'auto', fontStyle: 'bold' },
-      1: { cellWidth: 30, halign: 'center' },
+      1: { cellWidth: 40, halign: 'center' },
       2: { cellWidth: 40, halign: 'right' },
       3: { cellWidth: 40, halign: 'right', fontStyle: 'bold' }
     },
@@ -108,15 +108,15 @@ export const generateOrderPDF = (items: CartItem[]): void => {
     doc.text(
       `Página ${i} de ${pageCount}`,
       doc.internal.pageSize.width - 20,
-      doc.internal.pageSize.height - 10,
+      doc.internal.pageSize.height - 20,
       { align: 'right' }
     );
     
     // Add company info
     doc.text(
-      'Buffet App',
+      'Cuattro',
       20,
-      doc.internal.pageSize.height - 10
+      doc.internal.pageSize.height - 20
     );
   }
 
