@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { 
-  Container, 
-  Grid, 
-  Typography, 
+import {
+  Container,
+  Grid,
+  Typography,
   CircularProgress,
   Box,
   Drawer,
@@ -19,7 +19,9 @@ import {
   Toolbar,
   Slide,
   Chip,
-  Stack as MuiStack
+  Stack as MuiStack,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
 import { Menu as MenuIcon, Close as CloseIcon, Remove as RemoveIcon, Add as AddIcon } from '@mui/icons-material';
@@ -27,6 +29,7 @@ import { useCart } from '../hooks/useCart';
 import { Item } from '../services/itemService';
 import ItemService from '../services/itemService';
 import MenuItem from '../components/MenuItem';
+import ItemTable from '../components/ItemTable';
 import categoriaService, { Categoria } from '../services/categoriaService';
 
 const drawerWidth = 240;
@@ -47,6 +50,7 @@ const CustomerPage: React.FC = () => {
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [quickViewItem, setQuickViewItem] = useState<Item | null>(null);
+  const [isTableView, setIsTableView] = useState(false);
   const { addToCart, decrementFromCart, removeFromCart, items: cartItems } = useCart();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -396,35 +400,78 @@ const CustomerPage: React.FC = () => {
           width: { md: `calc(100% - ${drawerWidth}px)` }
         }}
       >
-        {filteredCategorias.map(([categoriaKey, categoriaItems]) => (
-          <Box key={categoriaKey} sx={{ mb: 6 }}>
-            <Typography 
-              variant="h4" 
-              component="h2" 
-              gutterBottom 
-              sx={{ 
-                mb: 4,
-                fontFamily: '"Playfair Display", serif',
-                fontWeight: 600
-              }}
-            >
-              {getCategoriaDisplay(categoriaItems[0]?.categoria)}
-            </Typography>
-            <Grid container spacing={3}>
-              {categoriaItems.map(item => (
-                <Grid item xs={12} sm={6} md={4} key={item.id}>
-                  <MenuItem
-                    item={item}
-                    onAdd={() => handleAddToCart(item)}
-                    onRemove={() => handleRemoveFromCart(item.id)}
-                    quantity={getItemQuantityInCart(item.id)}
-                    onQuickView={() => handleQuickView(item)}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        ))}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isTableView}
+                onChange={(e) => setIsTableView(e.target.checked)}
+                color="primary"
+              />
+            }
+            label={
+              <Typography sx={{ fontFamily: '"Montserrat", sans-serif' }}>
+                Visualização em Tabela
+              </Typography>
+            }
+          />
+        </Box>
+
+        {isTableView ? (
+          filteredCategorias.map(([categoriaKey, categoriaItems]) => (
+            <Box key={categoriaKey} sx={{ mb: 6 }}>
+              <Typography
+                variant="h4"
+                component="h2"
+                gutterBottom
+                sx={{
+                  mb: 4,
+                  fontFamily: '"Playfair Display", serif',
+                  fontWeight: 600
+                }}
+              >
+                {getCategoriaDisplay(categoriaItems[0]?.categoria)}
+              </Typography>
+              <ItemTable
+                items={categoriaItems}
+                onAdd={handleAddToCart}
+                onRemove={handleRemoveFromCart}
+                onQuickView={handleQuickView}
+                getItemQuantity={getItemQuantityInCart}
+              />
+            </Box>
+          ))
+        ) : (
+          filteredCategorias.map(([categoriaKey, categoriaItems]) => (
+            <Box key={categoriaKey} sx={{ mb: 6 }}>
+              <Typography
+                variant="h4"
+                component="h2"
+                gutterBottom
+                sx={{
+                  mb: 4,
+                  fontFamily: '"Playfair Display", serif',
+                  fontWeight: 600
+                }}
+              >
+                {getCategoriaDisplay(categoriaItems[0]?.categoria)}
+              </Typography>
+              <Grid container spacing={3}>
+                {categoriaItems.map(item => (
+                  <Grid item xs={12} sm={6} md={4} key={item.id}>
+                    <MenuItem
+                      item={item}
+                      onAdd={() => handleAddToCart(item)}
+                      onRemove={() => handleRemoveFromCart(item.id)}
+                      quantity={getItemQuantityInCart(item.id)}
+                      onQuickView={() => handleQuickView(item)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          ))
+        )}
       </Box>
 
       {/* Modal de Visualização Rápida */}
