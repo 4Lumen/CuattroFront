@@ -121,14 +121,23 @@ const ItemTable: React.FC<ItemTableProps> = ({
                     type="number"
                     value={getItemQuantity(item.id)}
                     onChange={(e) => {
-                      const newValue = parseInt(e.target.value) || 0;
+                      // Allow empty string for backspace/delete
+                      if (e.target.value === '') return;
+                      
+                      const newValue = Math.max(0, parseInt(e.target.value) || 0);
                       const currentValue = getItemQuantity(item.id);
-                      if (newValue > currentValue) {
-                        while (getItemQuantity(item.id) < newValue) {
+                      
+                      if (newValue === currentValue) return;
+                      
+                      const difference = newValue - currentValue;
+                      if (difference > 0) {
+                        // Add the difference
+                        for (let i = 0; i < difference; i++) {
                           onAdd(item);
                         }
-                      } else if (newValue < currentValue) {
-                        while (getItemQuantity(item.id) > newValue) {
+                      } else {
+                        // Remove the difference
+                        for (let i = 0; i < Math.abs(difference); i++) {
                           onRemove(item.id);
                         }
                       }
