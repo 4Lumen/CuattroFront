@@ -24,7 +24,14 @@ import {
   FormControlLabel
 } from '@mui/material';
 import { TransitionProps } from '@mui/material/transitions';
-import { Menu as MenuIcon, Close as CloseIcon, Remove as RemoveIcon, Add as AddIcon } from '@mui/icons-material';
+import {
+  Menu as MenuIcon,
+  Close as CloseIcon,
+  Remove as RemoveIcon,
+  Add as AddIcon,
+  ViewModule as ViewModuleIcon,
+  TableRows as TableRowsIcon
+} from '@mui/icons-material';
 import { useCart } from '../hooks/useCart';
 import { Item } from '../services/itemService';
 import ItemService from '../services/itemService';
@@ -50,7 +57,7 @@ const CustomerPage: React.FC = () => {
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [quickViewItem, setQuickViewItem] = useState<Item | null>(null);
-  const [isTableView, setIsTableView] = useState(false);
+  const [isTableView, setIsTableView] = useState(true);
   const { addToCart, decrementFromCart, removeFromCart, items: cartItems } = useCart();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -401,20 +408,37 @@ const CustomerPage: React.FC = () => {
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isTableView}
-                onChange={(e) => setIsTableView(e.target.checked)}
-                color="primary"
-              />
-            }
-            label={
-              <Typography sx={{ fontFamily: '"Montserrat", sans-serif' }}>
-                Visualização em Tabela
-              </Typography>
-            }
-          />
+          <Box
+            sx={{
+              display: 'flex',
+              border: 1,
+              borderColor: 'primary.main',
+              borderRadius: 1
+            }}
+          >
+            <IconButton
+              onClick={() => setIsTableView(false)}
+              sx={{
+                color: !isTableView ? 'primary.main' : 'text.secondary',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
+            >
+              <ViewModuleIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => setIsTableView(true)}
+              sx={{
+                color: isTableView ? 'primary.main' : 'text.secondary',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
+            >
+              <TableRowsIcon />
+            </IconButton>
+          </Box>
         </Box>
 
         {isTableView ? (

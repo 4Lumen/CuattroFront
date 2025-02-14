@@ -10,7 +10,8 @@ import {
   IconButton,
   Box,
   Typography,
-  Stack
+  Stack,
+  TextField
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -71,26 +72,14 @@ const ItemTable: React.FC<ItemTableProps> = ({
                 )}
               </TableCell>
               <TableCell>
-                <Stack spacing={1}>
-                  <Typography
-                    sx={{
-                      fontFamily: '"Playfair Display", serif',
-                      fontWeight: 600
-                    }}
-                  >
-                    {item.nome}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
-                      fontFamily: '"Roboto", sans-serif',
-                      fontSize: '0.875rem'
-                    }}
-                  >
-                    {item.descricao}
-                  </Typography>
-                </Stack>
+                <Typography
+                  sx={{
+                    fontFamily: '"Playfair Display", serif',
+                    fontWeight: 600
+                  }}
+                >
+                  {item.nome}
+                </Typography>
               </TableCell>
               <TableCell align="right">
                 <Typography
@@ -119,32 +108,59 @@ const ItemTable: React.FC<ItemTableProps> = ({
                     size="small"
                     sx={{
                       color: 'primary.main',
-                      bgcolor: 'primary.light',
                       '&:hover': {
-                        bgcolor: 'primary.light',
+                        backgroundColor: 'rgba(0, 0, 0, 0.04)',
                         transform: 'scale(1.1)'
                       }
                     }}
                   >
                     <RemoveIcon fontSize="small" />
                   </IconButton>
-                  <Typography
-                    sx={{
-                      fontFamily: '"Montserrat", sans-serif',
-                      fontWeight: 600,
-                      minWidth: 30
+                  <TextField
+                    size="small"
+                    type="number"
+                    value={getItemQuantity(item.id)}
+                    onChange={(e) => {
+                      const newValue = parseInt(e.target.value) || 0;
+                      const currentValue = getItemQuantity(item.id);
+                      if (newValue > currentValue) {
+                        while (getItemQuantity(item.id) < newValue) {
+                          onAdd(item);
+                        }
+                      } else if (newValue < currentValue) {
+                        while (getItemQuantity(item.id) > newValue) {
+                          onRemove(item.id);
+                        }
+                      }
                     }}
-                  >
-                    {getItemQuantity(item.id)}
-                  </Typography>
+                    inputProps={{
+                      min: 0,
+                      style: {
+                        textAlign: 'center',
+                        width: '50px',
+                        padding: '4px',
+                        fontFamily: '"Montserrat", sans-serif',
+                        fontWeight: 600
+                      }
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: 'primary.light',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: 'primary.main',
+                        }
+                      }
+                    }}
+                  />
                   <IconButton
                     onClick={() => onAdd(item)}
                     size="small"
                     sx={{
                       color: 'primary.main',
-                      bgcolor: 'primary.light',
                       '&:hover': {
-                        bgcolor: 'primary.light',
+                        backgroundColor: 'rgba(0, 0, 0, 0.04)',
                         transform: 'scale(1.1)'
                       }
                     }}

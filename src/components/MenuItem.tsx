@@ -86,10 +86,12 @@ const MenuItem: React.FC<MenuItemProps> = ({
                 startIcon={<VisibilityIcon />}
                 onClick={onQuickView}
                 sx={{
-                  bgcolor: 'background.paper',
-                  color: 'text.primary',
+                  backgroundColor: 'transparent',
+                  color: 'background.paper',
+                  border: 2,
+                  borderColor: 'background.paper',
                   '&:hover': {
-                    bgcolor: 'background.paper',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     transform: 'scale(1.05)'
                   }
                 }}
@@ -172,13 +174,15 @@ const MenuItem: React.FC<MenuItemProps> = ({
             aria-label="Remover do carrinho"
             sx={{
               color: 'primary.main',
-              bgcolor: 'primary.light',
+              border: 1,
+              borderColor: 'primary.main',
               '&:hover': {
-                bgcolor: 'primary.light',
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
                 transform: 'scale(1.1)'
               },
               '&.Mui-disabled': {
-                bgcolor: 'action.disabledBackground'
+                borderColor: 'action.disabled',
+                color: 'action.disabled'
               }
             }}
           >
@@ -201,9 +205,10 @@ const MenuItem: React.FC<MenuItemProps> = ({
             aria-label="Adicionar ao carrinho"
             sx={{
               color: 'primary.main',
-              bgcolor: 'primary.light',
+              border: 1,
+              borderColor: 'primary.main',
               '&:hover': {
-                bgcolor: 'primary.light',
+                backgroundColor: 'rgba(0, 0, 0, 0.04)',
                 transform: 'scale(1.1)'
               }
             }}
