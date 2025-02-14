@@ -16,10 +16,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   Snackbar,
   Alert,
   TextField
@@ -33,7 +29,6 @@ const CartPage: React.FC = () => {
   const { items, total, addToCart, decrementFromCart, clearCart } = useCart();
   const [user, setUser] = useState<any>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [formaPagamento, setFormaPagamento] = useState<string>('Dinheiro');
   const [enderecoEntrega, setEnderecoEntrega] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +82,7 @@ const CartPage: React.FC = () => {
         throw new Error('O carrinho está vazio');
       }
 
-      await PedidoService.createPedido(items, formaPagamento, enderecoEntrega);
+      await PedidoService.createPedido(items, 'Dinheiro', enderecoEntrega);
       console.log('Pedido criado com sucesso');
       clearCart();
       setSuccess(true);
@@ -193,32 +188,18 @@ const CartPage: React.FC = () => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Finalizar Pedido</DialogTitle>
         <DialogContent>
-          <Box sx={{ mb: 3, mt: 1 }}>
-            <TextField
-              fullWidth
-              label="Endereço de Entrega"
-              value={enderecoEntrega}
-              onChange={(e) => setEnderecoEntrega(e.target.value)}
-              multiline
-              rows={2}
-              required
-              error={!enderecoEntrega.trim()}
-              helperText={!enderecoEntrega.trim() ? 'Endereço é obrigatório' : ''}
-            />
-          </Box>
-          <FormControl component="fieldset">
-            <Typography variant="subtitle1" gutterBottom>
-              Forma de Pagamento
-            </Typography>
-            <RadioGroup
-              value={formaPagamento}
-              onChange={(e) => setFormaPagamento(e.target.value)}
-            >
-              <FormControlLabel value="Dinheiro" control={<Radio />} label="Dinheiro" />
-              <FormControlLabel value="Cartao" control={<Radio />} label="Cartão" />
-              <FormControlLabel value="Pix" control={<Radio />} label="PIX" />
-            </RadioGroup>
-          </FormControl>
+          <TextField
+            fullWidth
+            label="Endereço de Entrega"
+            value={enderecoEntrega}
+            onChange={(e) => setEnderecoEntrega(e.target.value)}
+            multiline
+            rows={2}
+            required
+            error={!enderecoEntrega.trim()}
+            helperText={!enderecoEntrega.trim() ? 'Endereço é obrigatório' : ''}
+            sx={{ mt: 1 }}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} color="inherit">
