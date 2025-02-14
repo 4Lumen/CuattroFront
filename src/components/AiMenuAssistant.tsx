@@ -76,7 +76,7 @@ const AiMenuAssistant: React.FC<AiMenuAssistantProps> = ({ items, onAddToCart })
 
   return (
     <>
-      <Tooltip title="AI Menu Assistant">
+      <Tooltip title="Assistente de Menu IA">
         <IconButton
           onClick={handleClick}
           sx={{
@@ -130,7 +130,7 @@ const AiMenuAssistant: React.FC<AiMenuAssistantProps> = ({ items, onAddToCart })
             rows={2}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Describe what you're looking for (e.g., 'I need food for 10 people, including vegetarian options')"
+            placeholder="Descreva o que você procura (ex: 'Preciso de comida para 10 pessoas, incluindo opções vegetarianas')"
             disabled={loading}
             sx={{ mb: 2 }}
           />
@@ -143,7 +143,7 @@ const AiMenuAssistant: React.FC<AiMenuAssistantProps> = ({ items, onAddToCart })
               disabled={loading || !input.trim()}
               endIcon={<SmartToyIcon />}
             >
-              Get Suggestions
+              Obter Sugestões
             </Button>
           </Box>
 
@@ -189,7 +189,7 @@ const AiMenuAssistant: React.FC<AiMenuAssistantProps> = ({ items, onAddToCart })
               {suggestion.dietaryNotes && suggestion.dietaryNotes.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
-                    Dietary Notes:
+                    Notas Nutricionais:
                   </Typography>
                   <Stack direction="row" spacing={1} flexWrap="wrap">
                     {suggestion.dietaryNotes.map((note, index) => (
@@ -214,7 +214,7 @@ const AiMenuAssistant: React.FC<AiMenuAssistantProps> = ({ items, onAddToCart })
               </Box>
 
               <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                <Tooltip title="Add all suggested items to cart">
+                <Tooltip title="Adicionar todos os itens sugeridos ao carrinho">
                   <IconButton
                     color="primary"
                     onClick={handleAddSuggestedItems}
