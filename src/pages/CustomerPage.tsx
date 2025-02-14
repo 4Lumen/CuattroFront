@@ -42,12 +42,9 @@ import categoriaService, { Categoria } from '../services/categoriaService';
 
 const drawerWidth = 240;
 
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
-  ref: React.Ref<unknown>,
-) {
+const Transition = React.forwardRef<unknown, TransitionProps & {
+  children: React.ReactElement;
+}>((props, ref) => {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
@@ -344,70 +341,9 @@ const CustomerPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ 
-      display: 'flex',
-      pt: 2,
-      position: 'relative'
-    }}>
-      {/* Menu Lateral */}
-      <Box
-        component="nav"
-        sx={{
-          width: { md: drawerWidth },
-          flexShrink: { md: 0 }
-        }}
-      >
-        {/* Versão mobile do menu */}
-        {isMobile && (
-          <Fab
-            color="primary"
-            aria-label="open menu"
-            onClick={handleDrawerToggle}
-            sx={{
-              position: 'fixed',
-              bottom: 16,
-              right: 16,
-              zIndex: 1000
-            }}
-          >
-            <MenuIcon />
-          </Fab>
-        )}
-        
-        {/* Menu drawer para mobile */}
-        <Drawer
-          variant={isMobile ? 'temporary' : 'permanent'}
-          open={isMobile ? mobileOpen : true}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true
-          }}
-          sx={{
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-              borderRight: '1px solid',
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
-              position: 'relative',
-              height: 'calc(100vh - 100px)',
-              marginTop: '16px'
-            }
-          }}
-        >
-          {drawer}
-        </Drawer>
-      </Box>
-
-      {/* Conteúdo Principal */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { md: `calc(100% - ${drawerWidth}px)` }
-        }}
-      >
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box sx={{ px: 3 }}>
+        {/* Controles superiores */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <AiMenuAssistant
@@ -426,247 +362,309 @@ const CustomerPage: React.FC = () => {
                 borderRadius: 1
               }}
             >
-            <IconButton
-              onClick={() => setIsTableView(false)}
-              sx={{
-                color: !isTableView ? 'primary.main' : 'text.secondary',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
-                }
-              }}
-            >
-              <ViewModuleIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => setIsTableView(true)}
-              sx={{
-                color: isTableView ? 'primary.main' : 'text.secondary',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 0, 0, 0.04)'
-                }
-              }}
-            >
-              <TableRowsIcon />
-            </IconButton>
+              <IconButton
+                onClick={() => setIsTableView(false)}
+                sx={{
+                  color: !isTableView ? 'primary.main' : 'text.secondary',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+              >
+                <ViewModuleIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => setIsTableView(true)}
+                sx={{
+                  color: isTableView ? 'primary.main' : 'text.secondary',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+              >
+                <TableRowsIcon />
+              </IconButton>
+            </Box>
           </Box>
         </Box>
       </Box>
 
-        {isTableView ? (
-          <Box sx={{ mb: 6 }}>
-            <ItemTable
-              items={filteredCategorias.flatMap(([_, items]) => items)}
-              onAdd={handleAddToCart}
-              onRemove={handleRemoveFromCart}
-              onQuickView={handleQuickView}
-              getItemQuantity={getItemQuantityInCart}
-            />
-          </Box>
-        ) : (
-          filteredCategorias.map(([categoriaKey, categoriaItems]) => (
-            <Box key={categoriaKey} sx={{ mb: 6 }}>
-              <Typography
-                variant="h4"
-                component="h2"
-                gutterBottom
-                sx={{
-                  mb: 4,
-                  fontFamily: '"Playfair Display", serif',
-                  fontWeight: 600
-                }}
-              >
-                {getCategoriaDisplay(categoriaItems[0]?.categoria)}
-              </Typography>
-              <Grid container spacing={3}>
-                {categoriaItems.map(item => (
-                  <Grid item xs={12} sm={6} md={4} key={item.id}>
-                    <MenuItem
-                      item={item}
-                      onAdd={() => handleAddToCart(item)}
-                      onRemove={() => handleRemoveFromCart(item.id)}
-                      quantity={getItemQuantityInCart(item.id)}
-                      onQuickView={() => handleQuickView(item)}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          ))
-        )}
-      </Box>
+      {/* Área principal com drawer e conteúdo */}
+      <Box sx={{ display: 'flex', px: 3 }}>
+         {/* Menu Lateral */}
+         <Box
+           component="nav"
+           sx={{
+             width: { md: drawerWidth },
+             flexShrink: { md: 0 }
+           }}
+         >
+           {/* Versão mobile do menu */}
+           {isMobile && (
+             <Fab
+               color="primary"
+               aria-label="open menu"
+               onClick={handleDrawerToggle}
+               sx={{
+                 position: 'fixed',
+                 bottom: 16,
+                 right: 16,
+                 zIndex: 1000
+               }}
+             >
+               <MenuIcon />
+             </Fab>
+           )}
+           
+           {/* Menu drawer para mobile */}
+           <Drawer
+             variant={isMobile ? 'temporary' : 'permanent'}
+             open={isMobile ? mobileOpen : true}
+             onClose={handleDrawerToggle}
+             ModalProps={{
+               keepMounted: true
+             }}
+             sx={{
+               '& .MuiDrawer-paper': {
+                 boxSizing: 'border-box',
+                 width: drawerWidth,
+                 borderRight: '1px solid',
+                 borderColor: 'divider',
+                 bgcolor: 'background.paper',
+                 position: 'relative',
+                 height: 'calc(100vh - 180px)',
+                 marginTop: '0'
+               }
+             }}
+           >
+             {drawer}
+           </Drawer>
+         </Box>
 
-      {/* Modal de Visualização Rápida */}
-      <Dialog
-        fullScreen={isMobile}
-        open={quickViewItem !== null}
-        onClose={handleCloseQuickView}
-        TransitionComponent={Transition}
-        PaperProps={{
-          sx: {
-            bgcolor: 'background.paper',
-            maxWidth: 'md',
-            maxHeight: '90vh'
-          }
-        }}
-      >
-        {quickViewItem && (
-          <>
-            {isMobile && (
-              <AppBar sx={{ position: 'relative' }}>
-                <Toolbar>
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    onClick={handleCloseQuickView}
-                    aria-label="close"
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography 
-                    sx={{ 
-                      ml: 2, 
-                      flex: 1,
-                      fontFamily: '"Playfair Display", serif'
-                    }}
-                    variant="h6"
-                  >
-                    {quickViewItem.nome}
-                  </Typography>
-                </Toolbar>
-              </AppBar>
-            )}
-            <Box sx={{ p: { xs: 2, md: 4 } }}>
-              <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                  {quickViewItem.imagemUrl && (
-                    <Box
-                      component="img"
-                      src={quickViewItem.imagemUrl}
-                      alt={quickViewItem.nome}
-                      sx={{
-                        width: '100%',
-                        height: 'auto',
-                        borderRadius: 2,
-                        boxShadow: 1
-                      }}
-                    />
-                  )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <MuiStack spacing={3}>
-                    {quickViewItem.categoria && (
-                      <Chip
-                        label={typeof quickViewItem.categoria === 'string' 
-                          ? quickViewItem.categoria 
-                          : quickViewItem.categoria.nome
-                        }
-                        size="small"
-                        sx={{
-                          alignSelf: 'flex-start',
-                          bgcolor: 'primary.main',
-                          color: '#000000',
-                          fontFamily: '"Roboto Condensed", sans-serif'
-                        }}
-                      />
-                    )}
-                    <Typography 
-                      variant="h4"
-                      sx={{
-                        fontFamily: '"Playfair Display", serif',
-                        fontWeight: 600
-                      }}
-                    >
-                      {quickViewItem.nome}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{
-                        fontFamily: '"Roboto", sans-serif',
-                        fontSize: '1rem',
-                        lineHeight: 1.7
-                      }}
-                    >
-                      {quickViewItem.descricao}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{
-                        fontFamily: '"Roboto", sans-serif',
-                        fontSize: '1rem',
-                        fontStyle: 'italic'
-                      }}
-                    >
-                      {quickViewItem.quantidade} {quickViewItem.unidadeMedida}
-                    </Typography>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontFamily: '"Montserrat", sans-serif',
-                        fontWeight: 600,
-                        color: 'primary.main'
-                      }}
-                    >
-                      {new Intl.NumberFormat('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL'
-                      }).format(quickViewItem.preco)}
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                      <MuiStack 
-                        direction="row" 
-                        spacing={2} 
-                        alignItems="center"
-                      >
-                        <IconButton 
-                          onClick={() => handleRemoveFromCart(quickViewItem.id)}
-                          disabled={getItemQuantityInCart(quickViewItem.id) === 0}
-                          sx={{
-                            color: 'primary.main',
-                            bgcolor: 'primary.light',
-                            '&:hover': {
-                              bgcolor: 'primary.light',
-                              transform: 'scale(1.1)'
-                            }
-                          }}
-                        >
-                          <RemoveIcon />
-                        </IconButton>
-                        <Typography 
-                          sx={{ 
-                            fontFamily: '"Montserrat", sans-serif',
-                            fontWeight: 600,
-                            minWidth: 40,
-                            textAlign: 'center'
-                          }}
-                        >
-                          {getItemQuantityInCart(quickViewItem.id)}
-                        </Typography>
-                        <IconButton 
-                          onClick={() => handleAddToCart(quickViewItem)}
-                          sx={{
-                            color: 'primary.main',
-                            bgcolor: 'primary.light',
-                            '&:hover': {
-                              bgcolor: 'primary.light',
-                              transform: 'scale(1.1)'
-                            }
-                          }}
-                        >
-                          <AddIcon />
-                        </IconButton>
-                      </MuiStack>
-                    </Box>
-                  </MuiStack>
-                </Grid>
-              </Grid>
-            </Box>
-          </>
-        )}
-      </Dialog>
+{/* Conteúdo da Lista */}
+<Box
+  sx={{
+    flexGrow: 1,
+    pl: 3,
+    width: { md: `calc(100% - ${drawerWidth}px)` }
+  }}
+>
+  {isTableView ? (
+    <Box sx={{ mb: 6 }}>
+      <ItemTable
+        items={filteredCategorias.flatMap(([_, items]) => items)}
+        onAdd={handleAddToCart}
+        onRemove={handleRemoveFromCart}
+        onQuickView={handleQuickView}
+        getItemQuantity={getItemQuantityInCart}
+      />
     </Box>
-  );
+  ) : (
+    filteredCategorias.map(([categoriaKey, categoriaItems]) => (
+      <Box key={categoriaKey} sx={{ mb: 6 }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          gutterBottom
+          sx={{
+            mb: 4,
+            fontFamily: '"Playfair Display", serif',
+            fontWeight: 600
+          }}
+        >
+          {getCategoriaDisplay(categoriaItems[0]?.categoria)}
+        </Typography>
+        <Grid container spacing={3}>
+          {categoriaItems.map(item => (
+            <Grid item xs={12} sm={6} md={4} key={item.id}>
+              <MenuItem
+                item={item}
+                onAdd={() => handleAddToCart(item)}
+                onRemove={() => handleRemoveFromCart(item.id)}
+                quantity={getItemQuantityInCart(item.id)}
+                onQuickView={() => handleQuickView(item)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    ))
+  )}
+</Box>
+</Box>
+
+{/* Modal de Visualização Rápida */}
+<Dialog
+fullScreen={isMobile}
+open={quickViewItem !== null}
+onClose={handleCloseQuickView}
+TransitionComponent={Transition}
+PaperProps={{
+  sx: {
+    bgcolor: 'background.paper',
+    maxWidth: 'md',
+    maxHeight: '90vh'
+  }
+}}
+>
+{quickViewItem && (
+  <>
+    {isMobile && (
+      <AppBar sx={{ position: 'relative' }}>
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={handleCloseQuickView}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+          <Typography
+            sx={{
+              ml: 2,
+              flex: 1,
+              fontFamily: '"Playfair Display", serif'
+            }}
+            variant="h6"
+          >
+            {quickViewItem.nome}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+    )}
+    <Box sx={{ p: { xs: 2, md: 4 } }}>
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={6}>
+          {quickViewItem.imagemUrl && (
+            <Box
+              component="img"
+              src={quickViewItem.imagemUrl}
+              alt={quickViewItem.nome}
+              sx={{
+                width: '100%',
+                height: 'auto',
+                borderRadius: 2,
+                boxShadow: 1
+              }}
+            />
+          )}
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <MuiStack spacing={3}>
+            {quickViewItem.categoria && (
+              <Chip
+                label={typeof quickViewItem.categoria === 'string'
+                  ? quickViewItem.categoria
+                  : quickViewItem.categoria.nome
+                }
+                size="small"
+                sx={{
+                  alignSelf: 'flex-start',
+                  bgcolor: 'primary.main',
+                  color: '#000000',
+                  fontFamily: '"Roboto Condensed", sans-serif'
+                }}
+              />
+            )}
+            <Typography
+              variant="h4"
+              sx={{
+                fontFamily: '"Playfair Display", serif',
+                fontWeight: 600
+              }}
+            >
+              {quickViewItem.nome}
+            </Typography>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{
+                fontFamily: '"Roboto", sans-serif',
+                fontSize: '1rem',
+                lineHeight: 1.7
+              }}
+            >
+              {quickViewItem.descricao}
+            </Typography>
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{
+                fontFamily: '"Roboto", sans-serif',
+                fontSize: '1rem',
+                fontStyle: 'italic'
+              }}
+            >
+              {quickViewItem.quantidade} {quickViewItem.unidadeMedida}
+            </Typography>
+            <Typography
+              variant="h4"
+              sx={{
+                fontFamily: '"Montserrat", sans-serif',
+                fontWeight: 600,
+                color: 'primary.main'
+              }}
+            >
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+              }).format(quickViewItem.preco)}
+            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <MuiStack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+              >
+                <IconButton
+                  onClick={() => handleRemoveFromCart(quickViewItem.id)}
+                  disabled={getItemQuantityInCart(quickViewItem.id) === 0}
+                  sx={{
+                    color: 'primary.main',
+                    bgcolor: 'primary.light',
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                      transform: 'scale(1.1)'
+                    }
+                  }}
+                >
+                  <RemoveIcon />
+                </IconButton>
+                <Typography
+                  sx={{
+                    fontFamily: '"Montserrat", sans-serif',
+                    fontWeight: 600,
+                    minWidth: 40,
+                    textAlign: 'center'
+                  }}
+                >
+                  {getItemQuantityInCart(quickViewItem.id)}
+                </Typography>
+                <IconButton
+                  onClick={() => handleAddToCart(quickViewItem)}
+                  sx={{
+                    color: 'primary.main',
+                    bgcolor: 'primary.light',
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                      transform: 'scale(1.1)'
+                    }
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </MuiStack>
+            </Box>
+          </MuiStack>
+        </Grid>
+      </Grid>
+    </Box>
+  </>
+)}
+</Dialog>
+</Box>
+);
 };
 
 export default CustomerPage;
