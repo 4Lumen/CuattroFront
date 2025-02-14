@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Typography,
@@ -12,51 +12,17 @@ import {
   IconButton,
   Box,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Snackbar,
-  Alert,
-  TextField
+  Alert
 } from '@mui/material';
 import { Add as AddIcon, Remove as RemoveIcon } from '@mui/icons-material';
 import { useCart } from '../hooks/useCart';
-import PedidoService from '../services/pedidoService';
-import AuthService from '../services/authService';
+import { generateOrderPDF } from '../services/pdfService';
 
 const CartPage: React.FC = () => {
-  const { items, total, addToCart, decrementFromCart, clearCart } = useCart();
-  const [user, setUser] = useState<any>(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [enderecoEntrega, setEnderecoEntrega] = useState('');
+  const { items, total, addToCart, decrementFromCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const currentUser = await AuthService.getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        console.error("Erro ao obter usuário:", error);
-        setError("Erro ao obter informações do usuário. Por favor, tente novamente.");
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  if (!user) {
-    return (
-      <Container>
-        <Typography variant="h5" align="center" sx={{ mt: 4 }}>
-          Por favor, faça login para continuar
-        </Typography>
-      </Container>
-    );
-  }
 
   if (items.length === 0) {
     return (
@@ -68,31 +34,16 @@ const CartPage: React.FC = () => {
     );
   }
 
-  const handleFinalizarPedido = async () => {
+  const handleFinalizarPedido = () => {
     try {
-      if (!enderecoEntrega.trim()) {
-        throw new Error('Por favor, informe o endereço de entrega');
-      }
-
       setLoading(true);
-      setError(null);
-      console.log('Iniciando finalização do pedido...');
-      
-      if (items.length === 0) {
-        throw new Error('O carrinho está vazio');
-      }
-
-      await PedidoService.createPedido(items, 'Dinheiro', enderecoEntrega);
-      console.log('Pedido criado com sucesso');
-      clearCart();
-      setSuccess(true);
-      setOpenDialog(false);
+      generateOrderPDF(items);
     } catch (error) {
-      console.error('Erro ao finalizar pedido:', error);
+      console.error('Erro ao gerar PDF:', error);
       if (error instanceof Error) {
         setError(error.message);
       } else {
-        setError('Erro ao finalizar pedido. Por favor, tente novamente.');
+        setError('Erro ao gerar o PDF. Por favor, tente novamente.');
       }
     } finally {
       setLoading(false);
@@ -127,9 +78,7 @@ const CartPage: React.FC = () => {
                         sx={{ width: 50, height: 50, objectFit: 'cover', marginRight: 2 }}
                       />
                     )}
-                    <Box>
-                      <Typography variant="subtitle1">{item.nome}</Typography>
-                    </Box>
+                    <Typography variant="subtitle1">{item.nome}</Typography>
                   </Box>
                 </TableCell>
                 <TableCell align="right">
@@ -137,21 +86,33 @@ const CartPage: React.FC = () => {
                 </TableCell>
                 <TableCell align="center">
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <IconButton 
+                    <IconButton
                       onClick={() => decrementFromCart(item.id)}
                       size="small"
                       color="primary"
                       disabled={quantity === 0}
+                      sx={{
+                        color: 'primary.main',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                        }
+                      }}
                     >
                       <RemoveIcon />
                     </IconButton>
                     <Typography sx={{ mx: 2 }}>
                       {quantity}
                     </Typography>
-                    <IconButton 
+                    <IconButton
                       onClick={() => addToCart(item, 1)}
                       size="small"
                       color="primary"
+                      sx={{
+                        color: 'primary.main',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                        }
+                      }}
                     >
                       <AddIcon />
                     </IconButton>
@@ -178,57 +139,23 @@ const CartPage: React.FC = () => {
           variant="contained"
           color="primary"
           size="large"
-          onClick={() => setOpenDialog(true)}
+          onClick={handleFinalizarPedido}
           disabled={loading}
+          sx={{
+            minWidth: 200,
+            '&.Mui-disabled': {
+              backgroundColor: 'primary.main',
+              opacity: 0.7
+            }
+          }}
         >
-          {loading ? 'Processando...' : 'Finalizar Pedido'}
+          {loading ? 'Gerando PDF...' : 'Finalizar Pedido'}
         </Button>
       </Box>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Finalizar Pedido</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Endereço de Entrega"
-            value={enderecoEntrega}
-            onChange={(e) => setEnderecoEntrega(e.target.value)}
-            multiline
-            rows={2}
-            required
-            error={!enderecoEntrega.trim()}
-            helperText={!enderecoEntrega.trim() ? 'Endereço é obrigatório' : ''}
-            sx={{ mt: 1 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="inherit">
-            Cancelar
-          </Button>
-          <Button 
-            onClick={handleFinalizarPedido} 
-            color="primary" 
-            disabled={loading || !enderecoEntrega.trim()}
-          >
-            {loading ? 'Processando...' : 'Confirmar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar 
-        open={success} 
-        autoHideDuration={6000} 
-        onClose={() => setSuccess(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setSuccess(false)} severity="success">
-          Pedido realizado com sucesso!
-        </Alert>
-      </Snackbar>
-
-      <Snackbar 
-        open={!!error} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
         onClose={() => setError(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
@@ -240,4 +167,4 @@ const CartPage: React.FC = () => {
   );
 };
 
-export default CartPage; 
+export default CartPage;
