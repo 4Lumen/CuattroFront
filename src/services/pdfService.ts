@@ -199,7 +199,7 @@ export const generateOrderPDF = async (items: CartItem[], mode: PDFMode = 'stand
       styles: {
         font: 'helvetica',
         fontSize: 11,
-        cellPadding: 8,
+        cellPadding: 4,
         textColor: secondaryRGB
       },
       columnStyles: {
