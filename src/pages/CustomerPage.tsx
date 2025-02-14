@@ -592,7 +592,18 @@ const CustomerPage: React.FC = () => {
                     >
                       {quickViewItem.descricao}
                     </Typography>
-                    <Typography 
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{
+                        fontFamily: '"Roboto", sans-serif',
+                        fontSize: '1rem',
+                        fontStyle: 'italic'
+                      }}
+                    >
+                      {quickViewItem.quantidade} {quickViewItem.unidadeMedida}
+                    </Typography>
+                    <Typography
                       variant="h4"
                       sx={{
                         fontFamily: '"Montserrat", sans-serif',
